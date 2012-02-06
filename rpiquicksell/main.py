@@ -20,7 +20,7 @@ from google.appengine.ext.webapp import util
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('Hello world2!')
+        self.response.out.write('Hello world3!')
 
 
 def main():
