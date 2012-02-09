@@ -7,5 +7,5 @@ handlers:
 - url: /assets
   static_dir: assets
 
-- url: /.*
-  script: helloworld.py
+- url: /*
+  script: isbnsearch.py
