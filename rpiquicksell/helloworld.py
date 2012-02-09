@@ -38,7 +38,7 @@ class MainPage(webapp.RequestHandler):
 		'url_linktext': url_linktext,
 		}
 
-		path = os.path.join(os.path.dirname(__file__), 'html/index.html')
+		path = os.path.join(os.path.dirname(__file__), 'index-bs.html')
 		self.response.out.write(template.render(path, template_values))
 
 class Guestbook(webapp.RequestHandler):
