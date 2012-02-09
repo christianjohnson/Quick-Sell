@@ -36,6 +36,8 @@ class MainPage(webapp.RequestHandler):
 		'greetings': greetings,
 		'url': url,
 		'url_linktext': url_linktext,
+		'guestbook_name':guestbook_name,
+		'guestbook_name_url':urllib.urlencode({'guestbook_name':guestbook_name}),
 		}
 
 		path = os.path.join(os.path.dirname(__file__), 'html/index.html')
