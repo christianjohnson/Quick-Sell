@@ -8,4 +8,4 @@ handlers:
   static_dir: assets
 
 - url: /.*
-  script: helloworld.py
+  script: main.py
