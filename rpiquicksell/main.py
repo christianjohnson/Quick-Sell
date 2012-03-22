@@ -50,6 +50,10 @@ class BrowseBooks(webapp.RequestHandler):
       'url_linktext': url_linktext,
       'books': books
     }
+    
+    book = models.Book(isbn=90909, title="Biology", price=50.03, description="Testing")
+    
+    book.put()
 
     path = os.path.join(os.path.dirname(__file__), 'books.html')
     self.response.out.write(template.render(path, template_values))
