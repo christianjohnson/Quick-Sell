@@ -14,17 +14,16 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
   def get(self):
-    if users.get_current_user():
+    user = users.get_current_user()
+    if user:
 			url = users.create_logout_url(self.request.uri)
 			url_linktext = 'Logout'
-			user = users.get_current_user()
     else:
       url = users.create_login_url(self.request.uri)
-      url_linktext = 'Login'
-      user = "Not Logged In"
+      url_linktext = "Log In"
 
     template_values = {
-      'user': user,
+      'url' : url,
       'url_linktext': url_linktext
     }
 
@@ -36,16 +35,15 @@ class BrowseBooks(webapp2.RequestHandler):
     user = users.get_current_user()
     if user:
 			url = users.create_logout_url(self.request.uri)
-			url_linktext = 'Welcome ' + user.nickname()
-			user = users.get_current_user()
+			url_linktext = 'Logout'
     else:
       url = users.create_login_url(self.request.uri)
-      url_linktext = 'Login'
-      user = "Not Logged In"
+      url_linktext = "Log In"
 
     books = models.Book.all()
     
     template_values = {
+      'url' : url,
       'url_linktext': url_linktext,
       'books': books
     }
@@ -84,9 +82,10 @@ class SellBooks(webapp2.RequestHandler):
       return
     else:  
   		url = users.create_logout_url(self.request.uri)
-  		url_linktext = 'Welcome' + user.nickname()
+  		url_linktext = 'Welcome ' + user.nickname()
       
     template_values = {
+      'url' : url,
       'url_linktext': url_linktext,
       'email' : user.email()
     }
