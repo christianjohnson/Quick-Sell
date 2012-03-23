@@ -5,19 +5,15 @@ import urllib
 import wsgiref.handlers
 
 from google.appengine.ext.webapp import template
+from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
-import models
-
-class Greeting(db.Model):
-	author = db.UserProperty()
+class Book(db.Model):
+	isbn = db.IntegerProperty()
 	content = db.StringProperty(multiline=True)
 	date = db.DateTimeProperty(auto_now_add=True)
-
-def guestbook_key(guestbook_name=None):
-	return db.Key.from_path('Guestbook', guestbook_name or 'default_guestbook')
 
 class MainPage(webapp.RequestHandler):
 	def get(self):
@@ -41,23 +37,11 @@ class MainPage(webapp.RequestHandler):
 		'guestbook_name_url':urllib.urlencode({'guestbook_name':guestbook_name}),
 		}
 
-		path = os.path.join(os.path.dirname(__file__), 'index-bs.html')
+		path = os.path.join(os.path.dirname(__file__), 'html/index.html')
 		self.response.out.write(template.render(path, template_values))
 
-class Guestbook(webapp.RequestHandler):
-	def post(self):
-		guestbook_name = self.request.get('guestbook_name')
-		greeting = Greeting(parent=guestbook_key(guestbook_name))
-
-		if users.get_current_user():
-			greeting.author = users.get_current_user()
-
-		greeting.content = self.request.get('content')
-		greeting.put()
-		self.redirect('/?' +urllib.urlencode({'guestbook_name':guestbook_name}))
-
 application = webapp.WSGIApplication([('/', MainPage),
-										('/sign',Guestbook)],debug=True)
+										debug=True)
 
 def main():
 	run_wsgi_app(application)
