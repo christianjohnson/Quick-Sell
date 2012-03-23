@@ -2,6 +2,24 @@
 <html lang="en">
 {% extends "base.html" %}
 
+{% block extra_script %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#sellBook").validate({
+    errorClass: "error",
+    validClass: "success",
+    errorElement: "span",
+        highlight: function (element, errorClass, validClass) { 
+  $(element).parents("div[class='clearfix']").addClass(errorClass).removeClass(validClass); 
+        }, 
+        unhighlight: function (element, errorClass, validClass) { 
+            $(element).parents(".error").removeClass(errorClass).addClass(validClass); 
+        }
+  });
+});
+</script>
+{% endblock %}
+
 {% block nav %}
           <div class="nav-collapse">
             <ul class="nav">
@@ -24,11 +42,11 @@
   <h1>Give us some information:</h1>
   <div class="row">
     <div class="span8 offset2">
-      <form class="well" action="/sellBook" method="post">  
+      <form id="sellBook" class="well" action="/sellBook" method="post">  
         <label>ISBN</label>  
-        <input name="isbn" type="text" class="span3" placeholder="ISBN Number">   
+        <input name="isbn" type="text" class="span3 required" placeholder="ISBN Number">   
         <label>Book Title</label>  
-        <input name="title" type="text" class="span3" placeholder="Book Title">
+        <input for="ccomment" name="title" type="text" class="required span3" placeholder="Book Title">
         <label>Price</label>  
         $<input name="price" type="text" class="span3" placeholder="Price">
         <label>Condition</label>

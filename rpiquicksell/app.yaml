@@ -8,14 +8,9 @@ handlers:
 - url: /assets
   static_dir: assets
 
-<<<<<<< HEAD
 - url: /.*
   script: main.app
 
 libraries:
 - name: jinja2
   version: latest
-=======
-- url: /*
-  script: isbnsearch.py
->>>>>>> isbn
