@@ -5,6 +5,6 @@ class Book(db.Model):
   isbn = db.IntegerProperty()
   title = db.StringProperty()
   user = db.UserProperty()
-  description = db.StringProperty(multiline=True)
+  condition = db.StringProperty()
   price = db.FloatProperty()
   date = db.DateTimeProperty(auto_now_add=True)
