@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends "base.html" %}
+
+{% block nav %}
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="./">Overview</a>
+              </li>
+              <li class="">
+                <a href="./browse">Browse Books</a>
+              </li>
+              <li class="active">
+                <a href="./sell">Sell Books</a>
+              </li>
+            </ul>
+          </div>
+{% endblock nav %}
+
+{% block content %}
+
+<div class="marketing">
+  <h1>Give us some information:</h1>
+  <div class="row">
+    <div class="span8 offset2">
+      <form class="well" action="/sellBook" method="post">  
+        <label>ISBN</label>  
+        <input name="isbn" type="text" class="span3" placeholder="ISBN Number">   
+        <label>Book Title</label>  
+        <input name="title" type="text" class="span3" placeholder="Book Title">
+        <label>Price</label>  
+        $<input name="price" type="text" class="span3" placeholder="Price">
+        <label>Condition</label>
+        <select name="condition">
+          <option>Poor</option>
+          <option>Heavily Used</option>
+          <option>Lightly Used</option>
+          <option>Brand New</option>
+        </select>
+        <label>Email</label>  
+        <input name="email" type="text" class="span3" readonly="true" placeholder="{{ email }}">
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>  
+      </form>
+    </div>
+  </div><!--/row-->
+</div><!-- /.marketing -->
+
+{% endblock content %}

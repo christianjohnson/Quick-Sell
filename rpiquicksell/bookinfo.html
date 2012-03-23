@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block nav %}
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="./">Overview</a>
+              </li>
+              <li class="">
+                <a href="./browse">Browse Books</a>
+              </li>
+              <li class="">
+                <a href="./sell">Sell Books</a>
+              </li>
+            </ul>
+          </div>
+{% endblock nav %}
+
+{% block content %}
+<div class="marketing">
+  <h1>Books information for {{ book.title }}:</h1>
+  <div class="row">
+    <div class="span8 offset2" id="books">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th><h2>Title</h2></th>
+            <th><h2>ISBN</h2></th>
+            <th><h2>Price</h2></th>
+            <th><h2>Condition</h2></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.isbn }}</td>
+            <td>${{ book.price }}</td>
+            <td>{{ book.condition }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!--/row-->
+</div><!-- /.marketing -->
+
+{% endblock content %}
