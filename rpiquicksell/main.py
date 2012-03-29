@@ -6,7 +6,7 @@ import cgi
 import webapp2
 
 from google.appengine.api import users
-
+from google.appengine.ext.db import BadValueError
 import models
 
 jinja_environment = jinja2.Environment(
@@ -27,7 +27,7 @@ class MainHandler(webapp2.RequestHandler):
       'url_linktext': url_linktext
     }
 
-    template = jinja_environment.get_template('index.html')
+    template = jinja_environment.get_template('html/index.html')
     self.response.out.write(template.render(template_values))
     
 class BrowseBooks(webapp2.RequestHandler):
@@ -48,7 +48,7 @@ class BrowseBooks(webapp2.RequestHandler):
       'books': books
     }
 
-    template = jinja_environment.get_template('browse.html')
+    template = jinja_environment.get_template('html/browse.html')
     self.response.out.write(template.render(template_values))
     
 class BookInformation(webapp2.RequestHandler):
@@ -71,7 +71,7 @@ class BookInformation(webapp2.RequestHandler):
       'book': book
     }
 
-    template = jinja_environment.get_template('bookinfo.html')
+    template = jinja_environment.get_template('html/bookinfo.html')
     self.response.out.write(template.render(template_values))
 
 class SellBooks(webapp2.RequestHandler):
@@ -90,7 +90,7 @@ class SellBooks(webapp2.RequestHandler):
       'email' : user.email()
     }
 
-    template = jinja_environment.get_template('sell.html')
+    template = jinja_environment.get_template('html/sell.html')
     self.response.out.write(template.render(template_values))
     
 class SellBookForm(webapp2.RequestHandler):
@@ -121,12 +121,42 @@ class SellBookForm(webapp2.RequestHandler):
                                  
     book_to_insert.put()
     self.redirect("/browse")
-    
 
+class Search(webapp2.RequestHandler):
+  def post(self):
+    
+    user = users.get_current_user()
+
+    if user:
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
+    else:
+      url = users.create_login_url(self.request.uri)
+      url_linktext = "Log In"
+    
+    try:
+      isbn = cgi.escape(self.request.get('search'))
+      int_isbn = int(isbn)
+    
+      books = models.Book.all().filter('isbn =',int_isbn).order('-date')
+    except ValueError:
+      int_isbn = 0
+      
+    template_values = {
+      'url' : url,
+      'url_linktext': url_linktext,
+      'books': books
+    }
+    
+    template = jinja_environment.get_template('html/browse.html')
+    self.response.out.write(template.render(template_values))
+       
+    
 app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/browse', BrowseBooks),
                                ('/bookInformation', BookInformation),
                                ('/sell', SellBooks),
-                               ('/sellBook', SellBookForm)], 
+                               ('/sellBook', SellBookForm),
+                               ('/search',Search)], 
                                debug=True)
 
