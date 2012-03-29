@@ -137,8 +137,7 @@ class Search(webapp2.RequestHandler):
     try:
       isbn = cgi.escape(self.request.get('search'))
       int_isbn = int(isbn)
-    
-      books = models.Book.all().filter('isbn =',int_isbn).order('-date')
+      books = models.Book.all().filter('isbn =', int_isbn).order('-date')
     except ValueError:
       int_isbn = 0
       
