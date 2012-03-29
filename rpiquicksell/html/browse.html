@@ -19,6 +19,12 @@
 {% block content %}
 
 <div class="marketing">
+  <center>
+    <form class="form-search" action="./search" method="post">
+      <input class="search-query" placeholder="isbn search" tabindex="1" type="text" maxlength="140" size="28" value="" name="search">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </center>
   <h1>Books for sale:</h1>
   <div class="row">
     <div class="span8 offset2" id="books">

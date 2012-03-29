@@ -142,7 +142,7 @@ class Search(webapp2.RequestHandler):
       logging.info('TRY?')
       isbn = cgi.escape(self.request.get('search'))
       int_isbn = int(isbn)
-    
+      
       books = models.Book.all().filter('isbn =',int_isbn).order('-date')
 
       isbndbbooks = books.filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
@@ -153,6 +153,7 @@ class Search(webapp2.RequestHandler):
           book.add_to_database(int_isbn)
       else:
         logging.info('external books already in database')
+    
     except ValueError:
       logging.warning('value error')
       int_isbn = 0
