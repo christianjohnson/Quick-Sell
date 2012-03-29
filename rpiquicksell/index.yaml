@@ -12,6 +12,13 @@ indexes:
 
 - kind: Book
   properties:
+  - name: is_local
+  - name: isbn
+  - name: date
+    direction: desc
+
+- kind: Book
+  properties:
   - name: isbn
   - name: date
     direction: desc

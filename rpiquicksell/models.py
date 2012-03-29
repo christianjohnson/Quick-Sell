@@ -7,4 +7,5 @@ class Book(db.Model):
   user = db.UserProperty()
   condition = db.StringProperty()
   price = db.FloatProperty()
+  is_local = db.BooleanProperty()
   date = db.DateTimeProperty(auto_now_add=True)

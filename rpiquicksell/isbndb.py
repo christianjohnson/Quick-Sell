@@ -1,6 +1,7 @@
 import xml.dom.minidom
 import urllib
 import book
+import logging
 
 class isbndb:
   def __init__(self,isbndb_access_key='X5ANT93D'):
@@ -29,6 +30,7 @@ class isbndb:
     url = self.bookSite+'access_key='+self.access_key+'&results=texts,details,prices&'
     if(isbn):
       url+='&index1=isbn&value1='+isbn
+      logging.debug('URL::: %s'%(url))
       xmlResponse = urllib.urlopen(url).read()
     elif(title):
       url+='&index1=title&value1='+title

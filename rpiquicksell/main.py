@@ -8,6 +8,9 @@ import webapp2
 from google.appengine.api import users
 from google.appengine.ext.db import BadValueError
 import models
+import isbndb
+import datetime
+import logging
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -117,7 +120,8 @@ class SellBookForm(webapp2.RequestHandler):
                                  title=title, 
                                  price=price,
                                  condition=condition,
-                                 user=user)
+                                 user=user,
+                                 is_local=True)
                                  
     book_to_insert.put()
     self.redirect("/browse")
@@ -135,11 +139,22 @@ class Search(webapp2.RequestHandler):
       url_linktext = "Log In"
     
     try:
+      logging.info('TRY?')
       isbn = cgi.escape(self.request.get('search'))
       int_isbn = int(isbn)
     
       books = models.Book.all().filter('isbn =',int_isbn).order('-date')
+
+      isbndbbooks = books.filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
+      if not isbndbbooks.get():
+        isbndb_query = isbndb.isbndb()
+        isbndbbooks = isbndb_query.searchBook(isbn)
+        for book in isbndbbooks:
+          book.add_to_database(int_isbn)
+      else:
+        logging.info('external books already in database')
     except ValueError:
+      logging.warning('value error')
       int_isbn = 0
       
     template_values = {
