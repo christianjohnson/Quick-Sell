@@ -41,7 +41,7 @@
             <td>
               <a href="./bookInformation?id={{book.key()}}">{{ book.title }}</a>
             </td>
-            <td>${{ book.price }}</td>
+            <td>${{ "%.2f" | format(book.price) }}</td>
           </tr>  
           {% endfor %}
         </tbody>
