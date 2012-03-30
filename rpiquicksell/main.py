@@ -11,6 +11,7 @@ import models
 import isbndb
 import datetime
 import logging
+from isbn import ISBN
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -43,7 +44,7 @@ class BrowseBooks(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
-    books = models.Book.all()
+    books = models.Book.all().filter('is_local =',True)
     
     template_values = {
       'url' : url,
@@ -105,9 +106,11 @@ class SellBookForm(webapp2.RequestHandler):
 
     #Form data
     try:
-      isbn = int(cgi.escape(self.request.get("isbn")))
+      isbn = ISBN(str(cgi.escape(self.request.get("isbn"))))
+      isbn.to_isbn13()
+      text_isbn = isbn.format('')
     except BadValueError:
-      isbn = 0
+      text_isbn = None
     title = cgi.escape(self.request.get("title"))
     try:
       price = float(cgi.escape(self.request.get("price")))
@@ -115,16 +118,19 @@ class SellBookForm(webapp2.RequestHandler):
       price = 0.0
 
     condition = cgi.escape(self.request.get("condition"))
-
-    book_to_insert = models.Book(isbn=isbn, 
+    
+    if(text_isbn):
+      book_to_insert = models.Book(isbn=text_isbn, 
                                  title=title, 
                                  price=price,
                                  condition=condition,
                                  user=user,
                                  is_local=True)
                                  
-    book_to_insert.put()
-    self.redirect("/browse")
+      book_to_insert.put()
+      self.redirect("/browse")
+    else:
+      self.redirect('/sell')
 
 class Search(webapp2.RequestHandler):
   def post(self):
@@ -139,18 +145,18 @@ class Search(webapp2.RequestHandler):
       url_linktext = "Log In"
     
     try:
-      logging.info('TRY?')
-      isbn = cgi.escape(self.request.get('search'))
-      int_isbn = int(isbn)
+      isbn = ISBN(str(cgi.escape(self.request.get('search'))))
+      isbn.to_isbn13()
+      text_isbn = isbn.format('')
       
-      books = models.Book.all().filter('isbn =',int_isbn).order('-date')
+      books = models.Book.all().filter('isbn =',text_isbn).order('-date')
 
-      isbndbbooks = books.filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
+      isbndbbooks = models.Book.all().filter('isbn =',text_isbn).order('-date').filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
       if not isbndbbooks.get():
         isbndb_query = isbndb.isbndb()
-        isbndbbooks = isbndb_query.searchBook(isbn)
+        isbndbbooks = isbndb_query.searchBook(text_isbn)
         for book in isbndbbooks:
-          book.add_to_database(int_isbn)
+          book.add_to_database(text_isbn)
       else:
         logging.info('external books already in database')
     

@@ -2,7 +2,7 @@ from google.appengine.ext import db
 
 class Book(db.Model):
   """Models an individual book."""
-  isbn = db.IntegerProperty()
+  isbn = db.StringProperty()
   title = db.StringProperty()
   user = db.UserProperty()
   condition = db.StringProperty()
