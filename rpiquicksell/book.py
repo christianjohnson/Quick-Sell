@@ -60,7 +60,8 @@ class Book:
         book_to_add = models.Book(isbn = isbn,
                     title=self.title,
                     is_local=False,
-                    price=_price.price)
+                    price=_price.price,
+                    url=_price.url)
         book_to_add.put()
 
 

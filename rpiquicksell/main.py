@@ -170,7 +170,7 @@ class Search(webapp2.RequestHandler):
       'books': books
     }
     
-    template = jinja_environment.get_template('html/browse.html')
+    template = jinja_environment.get_template('html/search.html')
     self.response.out.write(template.render(template_values))
        
     
