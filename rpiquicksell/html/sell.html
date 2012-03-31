@@ -39,21 +39,24 @@ $(document).ready(function(){
 {% block content %}
 
 <div class="marketing">
-  <h1>Give us some information:</h1>
+ <h1>Give us some information:</h1>
+  {% if badisbn %}
+   <p>Sorry, that ISBN you entered wasn't valid.</p>
+  {% endif %}
   <div class="row">
     <div class="span8 offset2">
       <form id="sellBook" class="well" action="/sellBook" method="post">  
         <label>ISBN</label>  
         <input name="isbn" type="text" class="span3 required" placeholder="ISBN Number">   
         <label>Book Title</label>  
-        <input for="ccomment" name="title" type="text" class="required span3" placeholder="Book Title">
+        <input for="ccomment" name="title" type="text" class="required span3" {% if badisbn %} value={{prev_title}} {% else %} placeholder="Book Title" {% endif %}>
         <label>Price</label>  
-        $<input name="price" type="text" class="span3 required" placeholder="Price">
+        $<input name="price" type="text" class="span3 required"{% if badisbn %} value={{prev_price}} {% else %} placeholder="Price" {% endif %}>
         <label>Condition</label>
         <select name="condition">
           <option>Poor</option>
           <option>Heavily Used</option>
-          <option>Lightly Used</option>
+          <option selected='selected'>Lightly Used</option>
           <option>Brand New</option>
         </select>
         <label>Email</label>  

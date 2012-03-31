@@ -3,6 +3,7 @@
 import jinja2
 import cgi
 import webapp2
+import urllib
 
 from google.appengine.api import users
 from google.appengine.ext.db import BadValueError
@@ -89,12 +90,23 @@ class SellBooks(webapp2.RequestHandler):
     else:  
   		url = users.create_logout_url(self.request.uri)
   		url_linktext = 'Welcome ' + user.nickname()
-      
-    template_values = {
-      'url' : url,
-      'url_linktext': url_linktext,
-      'email' : user.email()
-    }
+    
+    if(self.request.get('badisbn')):
+      template_values = {
+          'url' : url,
+          'url_linktext': url_linktext,
+          'email' : user.email(),
+          'badisbn' : True,
+          'prev_title' : self.request.get('title'),
+          'prev_price' : self.request.get('price')
+      }
+    else:
+      template_values = {
+          'url' : url,
+          'url_linktext': url_linktext,
+          'email' : user.email(),
+          'badisbn' : False
+      }
 
     template = jinja_environment.get_template('html/sell.html')
     self.response.out.write(template.render(template_values))
@@ -111,7 +123,7 @@ class SellBookForm(webapp2.RequestHandler):
       isbn = ISBN(str(cgi.escape(self.request.get("isbn"))))
       isbn.to_isbn13()
       text_isbn = isbn.format('')
-    except BadValueError:
+    except ValueError:
       text_isbn = None
     title = cgi.escape(self.request.get("title"))
     try:
@@ -132,7 +144,7 @@ class SellBookForm(webapp2.RequestHandler):
       book_to_insert.put()
       self.redirect("/browse")
     else:
-      self.redirect('/sell')
+      self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class Search(webapp2.RequestHandler):
   def post(self):
@@ -146,30 +158,36 @@ class Search(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
     
+    text_isbn = str(cgi.escape(self.request.get('search')))
+    logging.info(text_isbn)
     try:
-      isbn = ISBN(str(cgi.escape(self.request.get('search'))))
+      isbn = ISBN(text_isbn)
       isbn.to_isbn13()
-      text_isbn = isbn.format('')
+      clean_isbn = isbn.format('')
       
-      books = models.Book.all().filter('isbn =',text_isbn).order('-date')
+      books = models.Book.all().filter('isbn =',clean_isbn).order('-date')
 
-      isbndbbooks = models.Book.all().filter('isbn =',text_isbn).order('-date').filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
+      isbndbbooks = models.Book.all().filter('isbn =',clean_isbn).order('-date').filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
       if not isbndbbooks.get():
         isbndb_query = isbndb.isbndb()
-        isbndbbooks = isbndb_query.searchBook(text_isbn)
+        isbndbbooks = isbndb_query.searchBook(clean_isbn)
         for book in isbndbbooks:
-          book.add_to_database(text_isbn)
+          book.add_to_database(clean_isbn)
       else:
         logging.info('external books already in database')
-    
+      title = isbndbbooks.get().title
     except ValueError:
       logging.warning('value error')
-      int_isbn = 0
+      books = []
+      title = "Not Found"
       
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
-      'books': books
+      'books': books,
+      'bookTitle':title,
+      'text_isbn':text_isbn,
+      'book_not_found':books==[]
     }
     
     template = jinja_environment.get_template('html/search.html')
