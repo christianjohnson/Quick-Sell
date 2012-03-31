@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 import jinja2
-import os
 import cgi
 import webapp2
 
 from google.appengine.api import users
 from google.appengine.ext.db import BadValueError
 import models
-import isbndb
-import datetime
 import logging
-from isbn import ISBN
+
+import os
+import datetime
+
+from isbndb.isbn import ISBN
+import isbndb.isbndb
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
