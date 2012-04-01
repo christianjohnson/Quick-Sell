@@ -23,6 +23,7 @@ class ISBN:
                 self.isbn = stem + self.check(stem)
             else:
                 raise ValueError("ISBN not convertible")
+        return self
 
     def valid(self):
         """Check the validity of an ISBN. Works for either ISBN-10 or ISBN-13."""
@@ -93,6 +94,7 @@ class ISBN:
 
         if not self.valid_isbn10():
             self.convert()
+        return self
 
     def to_isbn13(self):
         """Converts supplied ISBN (either ISBN-10 or ISBN-13) to a stripped ISBN-13."""
@@ -102,6 +104,7 @@ class ISBN:
 
         if not self.valid_isbn13():
             self.convert()
+        return self
 
     def format(self, sep=""):
         s = self.isbn

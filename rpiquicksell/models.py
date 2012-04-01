@@ -9,4 +9,5 @@ class Book(db.Model):
   price = db.FloatProperty()
   is_local = db.BooleanProperty()
   url = db.StringProperty()
+  external_store = db.StringProperty()
   date = db.DateTimeProperty(auto_now_add=True)

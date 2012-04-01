@@ -61,7 +61,8 @@ class Book:
                     title=self.title,
                     is_local=False,
                     price=_price.price,
-                    url=_price.url)
+                    url=_price.url,
+                    external_store=_price.storeID)
         book_to_add.put()
 
 

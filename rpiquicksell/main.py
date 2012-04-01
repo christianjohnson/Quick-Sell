@@ -16,6 +16,9 @@ import datetime
 from isbndb.isbn import ISBN
 import isbndb.isbndb
 
+from search.search import Search as mySearch
+
+
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -169,26 +172,16 @@ class Search(webapp2.RequestHandler):
     text_isbn = str(cgi.escape(self.request.get('search')))
     logging.info(text_isbn)
     try:
-      isbn = ISBN(text_isbn)
-      isbn.to_isbn13()
-      clean_isbn = isbn.format('')
-      
-      books = models.Book.all().filter('isbn =',clean_isbn).order('-date')
-
-      isbndbbooks = models.Book.all().filter('isbn =',clean_isbn).order('-date').filter('is_local =',False).filter('date >=',datetime.datetime.now()-datetime.timedelta(10))
-      if not isbndbbooks.get():
-        isbndb_query = isbndb.isbndb()
-        isbndbbooks = isbndb_query.searchBook(clean_isbn)
-        for book in isbndbbooks:
-          book.add_to_database(clean_isbn)
-      else:
-        logging.info('external books already in database')
-      title = isbndbbooks.get().title
+      search = mySearch(text_isbn)
+      (local_books,external_books) = search.next()
+      title = external_books[0].title
     except ValueError:
       logging.warning('value error')
-      books = []
+      local_books = []
+      external_books = []
       title = "Not Found"
       
+    books = local_books+external_books
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,

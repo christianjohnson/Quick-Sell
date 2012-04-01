@@ -70,7 +70,7 @@
           {% if not book.is_local %}
           <tr>
             <td>
-              <a href={{book.url}}>{{ book.title }}</a>
+              <a href={{book.url}}>{{ book.title }} at {% if book.external_store %}{{ book.external_store }} {% else %} Unknown {% endif %}</a>
             </td>
             <td>${{ "%.2f" | format(book.price) }}</td>
           </tr>  
