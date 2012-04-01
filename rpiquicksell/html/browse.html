@@ -32,16 +32,14 @@
         <thead>
           <tr>
             <th><h2>Title</h2></th>
-            <th><h2>Price</h2></th>
           </tr>
         </thead>
         <tbody>
-          {% for book in books %}
+          {% for (isbn,title) in books %}
           <tr>
             <td>
-              <a href="./bookInformation?id={{book.key()}}">{{ book.title }}</a>
+              <a href="./search?search={{isbn}}">{{ title }}</a>
             </td>
-            <td>${{ "%.2f" | format(book.price) }}</td>
           </tr>  
           {% endfor %}
         </tbody>

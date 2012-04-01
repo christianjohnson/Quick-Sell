@@ -47,12 +47,17 @@ class BrowseBooks(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
-    books = models.Book.all().filter('is_local =',True)
+    books = models.Book.all().filter('is_local =',True).order('-date')
     
+    books2 = {}
+    for book in books:
+        if not book.isbn in books2:
+            books2[book.isbn] = book.title
+
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
-      'books': books
+      'books': books2.items()
     }
 
     template = jinja_environment.get_template('html/browse.html')
@@ -147,6 +152,9 @@ class SellBookForm(webapp2.RequestHandler):
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class Search(webapp2.RequestHandler):
+  def get(self):
+    self.post()
+
   def post(self):
     
     user = users.get_current_user()
