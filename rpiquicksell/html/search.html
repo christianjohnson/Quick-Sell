@@ -38,6 +38,7 @@
         <thead>
           <tr>
             <th><h2>Title</h2></th>
+            <th><h2>Condition</h2></th>
             <th><h2>Price</h2></th>
           </tr>
         </thead>
@@ -48,6 +49,7 @@
             <td>
               <a href="./bookInformation?id={{book.key()}}">{{ book.title }}</a>
             </td>
+            <td>{{ book.condition }}</td>
             <td>${{ "%.2f" | format(book.price) }}</td>
           </tr>  
           {% endif %}
