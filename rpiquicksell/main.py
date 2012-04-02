@@ -7,6 +7,8 @@ import urllib
 
 from google.appengine.api import users
 from google.appengine.ext.db import BadValueError
+from google.appengine.ext.webapp import template
+
 import models
 import logging
 
@@ -18,6 +20,8 @@ import isbndb.isbndb
 
 from search.search import Search as mySearch
 
+
+#template.register_template_library('common.test_filter')
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -50,17 +54,12 @@ class BrowseBooks(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
-    books = models.Book.all().filter('is_local =',True).order('-date')
+    books = models.UniqueBook.all().order('-lastAdded')
     
-    books2 = {}
-    for book in books:
-        if not book.isbn in books2:
-            books2[book.isbn] = book.title
-
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
-      'books': books2.items()
+      'books': books
     }
 
     template = jinja_environment.get_template('html/browse.html')
@@ -150,6 +149,17 @@ class SellBookForm(webapp2.RequestHandler):
                                  is_local=True)
                                  
       book_to_insert.put()
+
+      unique_book = models.UniqueBook.all().filter('isbn = ', text_isbn).get()
+      if(unique_book):
+        unique_book.lastAdded = book_to_insert.date
+        unique_book.put()
+      else:
+        unique_book = models.UniqueBook(isbn=text_isbn,
+                                        title=title,
+                                        lastAdded=book_to_insert.date)
+        unique_book.put()
+
       self.redirect("/browse")
     else:
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))

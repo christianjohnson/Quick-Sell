@@ -32,13 +32,17 @@
         <thead>
           <tr>
             <th><h2>Title</h2></th>
+            <th><h2>Date</h2></th>
           </tr>
         </thead>
         <tbody>
-          {% for (isbn,title) in books %}
+          {% for book in books %}
           <tr>
             <td>
-              <a href="./search?search={{isbn}}">{{ title }}</a>
+              <a href="./search?search={{ book.isbn }}">{{ book.title }}</a>
+            </td>
+            <td>
+            {{ book.lastAdded }}
             </td>
           </tr>  
           {% endfor %}
