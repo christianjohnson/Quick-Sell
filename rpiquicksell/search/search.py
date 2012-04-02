@@ -1,9 +1,10 @@
 import models
 from isbndb.isbndb import isbndb
 from isbndb.isbn import ISBN
+from books.uniqueBook import UniqueBook
 import datetime
 
-
+import logging
 
 class Search(object):
   def __init__(self,search_string,querysize = 10):
@@ -21,11 +22,20 @@ class Search(object):
       
       if not remote_books:
         isbndb_query = isbndb()
+        
+        logging.info('making query to isbndb')
+
         isbnbooks = isbndb_query.searchBook(isbn=self.isbn.format(''))
         
+        logging.info('found %d books on isbndb'%len(isbnbooks))
+
+        UniqueBook(isbn,isbnbooks[0].title)
         for book in isbnbooks:
           book.add_to_database(self.isbn.format(''))
-      
+      else:
+        uniquebook = UniqueBook(self.isbn.format(''),remote_books.title)
+        self.title = uniquebook.title
+
       self.local_books = models.Book.all().filter('isbn =', self.isbn.format('')).filter('is_local =', True).order('-date')
       self.remote_books = models.Book.all().filter('isbn =', self.isbn.format('')).filter('is_local =', False).order('-date')
     
@@ -45,8 +55,8 @@ class Search(object):
     self.offset+=self.limit
     if self.isbn_search:
       return (True,
-              self.local_books.fetch(self.limit,self.offset-self.limit),
-              self.remote_books.fetch(self.limit,self.offset-self.limit))
+              '',
+              self.remote_books.fetch(self.limit,self.offset-self.limit)+self.local_books.fetch(self.limit,self.offset-self.limit))
     else:
       return (False,
               self.search_text,

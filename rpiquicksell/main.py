@@ -20,6 +20,7 @@ from isbndb.isbn import ISBN
 import isbndb.isbndb
 
 from search.search import Search as mySearch
+from books.uniqueBook import UniqueBook
 
 
 #template.register_template_library('common.test_filter')
@@ -144,17 +145,8 @@ class SellBookForm(webapp2.RequestHandler):
                                  is_local=True)
                                  
       book_to_insert.put()
-
-      unique_book = models.UniqueBook.all().filter('isbn = ', text_isbn).get()
-      if(unique_book):
-        unique_book.lastAdded = book_to_insert.date
-        unique_book.put()
-      else:
-        unique_book = models.UniqueBook(isbn=text_isbn,
-                                        title=title,
-                                        lastAdded=book_to_insert.date,
-                                        sellpage = '/sell?'+urllib.urlencode({'isbn':text_isbn,'title':title}))
-        unique_book.put()
+      
+      UniqueBook(text_isbn,title)
 
       self.redirect("/browse")
     else:
@@ -177,21 +169,21 @@ class Search(webapp2.RequestHandler):
     
     text_isbn = str(cgi.escape(self.request.get('search')))
     logging.info(text_isbn)
-    try:
-      search = mySearch(text_isbn)
-      (search_type,arg1,arg2) = search.next()
-    except:
-      search_type = True
-      arg1 = []
-      arg2 = []
+    #try:
+    search = mySearch(text_isbn)
+    (search_type,arg1,arg2) = search.next()
+    #except:
+    #  search_type = True
+    #  arg1 = 'Not Found'
+    #  arg2 = []
 
     if(search_type):
-      books = arg1+arg2
+      books = arg2
       template_values = {
         'url' : url,
         'url_linktext': url_linktext,
         'books': books,
-        'bookTitle':arg2[0].title,
+        'bookTitle':arg1,
         'text_isbn':text_isbn,
         'book_not_found':books==[]
       }
