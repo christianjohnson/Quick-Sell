@@ -183,27 +183,37 @@ class Search(webapp2.RequestHandler):
     logging.info(text_isbn)
     try:
       search = mySearch(text_isbn)
-      (local_books,external_books) = search.next()
-      title = external_books[0].title
-    except ValueError:
-      logging.warning('value error')
-      local_books = []
-      external_books = []
-      title = "Not Found"
-      
-    books = local_books+external_books
-    template_values = {
-      'url' : url,
-      'url_linktext': url_linktext,
-      'books': books,
-      'bookTitle':title,
-      'text_isbn':text_isbn,
-      'book_not_found':books==[]
-    }
+      (search_type,arg1,arg2) = search.next()
+    except:
+      search_type = True
+      arg1 = []
+      arg2 = []
+
+    if(search_type):
+      books = arg1+arg2
+      template_values = {
+        'url' : url,
+        'url_linktext': url_linktext,
+        'books': books,
+        'bookTitle':arg2[0].title,
+        'text_isbn':text_isbn,
+        'book_not_found':books==[]
+      }
+
     
-    template = jinja_environment.get_template('html/search.html')
-    self.response.out.write(template.render(template_values))
-       
+      template = jinja_environment.get_template('html/search.html')
+      self.response.out.write(template.render(template_values))
+    
+    else:
+      template_values = {
+        'url' : url,
+        'url_linktext' : url_linktext,
+        'search_text' : arg1,
+        'books' : arg2
+      }
+      template = jinja_environment.get_template('html/browse.html')
+      self.response.out.write(template.render(template_values))
+
     
 app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/browse', BrowseBooks),

@@ -25,7 +25,11 @@
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
   </center>
+  {% if search_text %}
+  <h1>Search: {{search_text}}</h1> 
+  {% else %}
   <h1>Books for sale:</h1>
+  {% endif %}
   <div class="row">
     <div class="span8 offset2" id="books">
       <table class="table table-striped">
