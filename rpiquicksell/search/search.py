@@ -29,7 +29,7 @@ class Search(object):
         
         logging.info('found %d books on isbndb'%len(isbnbooks))
 
-        UniqueBook(isbn,isbnbooks[0].title)
+        UniqueBook(self.isbn.format(''),isbnbooks[0].title)
         for book in isbnbooks:
           book.add_to_database(self.isbn.format(''))
       else:
