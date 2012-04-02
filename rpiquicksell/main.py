@@ -105,10 +105,10 @@ class SellBooks(webapp2.RequestHandler):
       'url' : url,
       'url_linktext' : url_linktext,
       'email' : user.email(),
-      'badisbn' : self.request.get('badisbn'),
-      'title' : self.request.get('title'),
-      'price' : self.request.get('price'),
-      'isbn' : self.request.get('isbn')
+      'badisbn' : cgi.escape(self.request.get('badisbn')),
+      'title' : cgi.escape(self.request.get('title')),
+      'price' : cgi.escape(self.request.get('price')),
+      'isbn' : cgi.escape(self.request.get('isbn'))
     }
 
     template = jinja_environment.get_template('html/sell.html')
