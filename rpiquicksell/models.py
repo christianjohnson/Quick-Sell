@@ -16,3 +16,4 @@ class UniqueBook(db.Model):
   isbn = db.StringProperty(required=True)
   title = db.StringProperty(required=True)
   lastAdded = db.DateTimeProperty()
+  sellpage = db.StringProperty(required=True)

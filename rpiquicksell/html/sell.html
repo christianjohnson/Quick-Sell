@@ -47,11 +47,11 @@ $(document).ready(function(){
     <div class="span8 offset2">
       <form id="sellBook" class="well" action="/sellBook" method="post">  
         <label>ISBN</label>  
-        <input name="isbn" type="text" class="span3 required" placeholder="ISBN Number">   
+        <input name="isbn" type="text" class="span3 required" {% if isbn %} value={{ isbn }} {% else %} placeholder="ISBN" {% endif %}>   
         <label>Book Title</label>  
-        <input for="ccomment" name="title" type="text" class="required span3" {% if badisbn %} value={{prev_title}} {% else %} placeholder="Book Title" {% endif %}>
+        <input for="ccomment" name="title" type="text" class="required span3" {% if title %} value="{{title}}" {% else %} placeholder="Book Title" {% endif %}>
         <label>Price</label>  
-        $<input name="price" type="text" class="span3 required"{% if badisbn %} value={{prev_price}} {% else %} placeholder="Price" {% endif %}>
+        $<input name="price" type="text" class="span3 required"{% if price %} value={{ price }} {% else %} placeholder="Price" {% endif %}>
         <label>Condition</label>
         <select name="condition">
           <option>Poor</option>

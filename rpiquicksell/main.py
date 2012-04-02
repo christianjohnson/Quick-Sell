@@ -4,6 +4,7 @@ import jinja2
 import cgi
 import webapp2
 import urllib
+import urlparse
 
 from google.appengine.api import users
 from google.appengine.ext.db import BadValueError
@@ -98,22 +99,16 @@ class SellBooks(webapp2.RequestHandler):
   		url = users.create_logout_url(self.request.uri)
   		url_linktext = 'Welcome ' + user.nickname()
     
-    if(self.request.get('badisbn')):
-      template_values = {
-          'url' : url,
-          'url_linktext': url_linktext,
-          'email' : user.email(),
-          'badisbn' : True,
-          'prev_title' : self.request.get('title'),
-          'prev_price' : self.request.get('price')
-      }
-    else:
-      template_values = {
-          'url' : url,
-          'url_linktext': url_linktext,
-          'email' : user.email(),
-          'badisbn' : False
-      }
+    
+    template_values = {
+      'url' : url,
+      'url_linktext' : url_linktext,
+      'email' : user.email(),
+      'badisbn' : self.request.get('badisbn'),
+      'title' : self.request.get('title'),
+      'price' : self.request.get('price'),
+      'isbn' : self.request.get('isbn')
+    }
 
     template = jinja_environment.get_template('html/sell.html')
     self.response.out.write(template.render(template_values))
@@ -157,7 +152,8 @@ class SellBookForm(webapp2.RequestHandler):
       else:
         unique_book = models.UniqueBook(isbn=text_isbn,
                                         title=title,
-                                        lastAdded=book_to_insert.date)
+                                        lastAdded=book_to_insert.date,
+                                        sellpage = '/sell?'+urllib.urlencode({'isbn':text_isbn,'title':title}))
         unique_book.put()
 
       self.redirect("/browse")

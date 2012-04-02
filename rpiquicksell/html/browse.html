@@ -36,6 +36,7 @@
         <thead>
           <tr>
             <th><h2>Title</h2></th>
+            <th></th>
             <th><h2>Date</h2></th>
           </tr>
         </thead>
@@ -45,6 +46,8 @@
             <td>
               <a href="./search?search={{ book.isbn }}">{{ book.title }}</a>
             </td>
+            <td>
+            <a href="{{ book.sellpage }}">sell this book</a>
             <td>
             {{ book.lastAdded }}
             </td>
