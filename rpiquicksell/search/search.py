@@ -36,8 +36,9 @@ class Search(object):
       books = models.UniqueBook.all().order('-lastAdded')
       self.text_books = []
       for book in books:
-        arrtitle = book.title.split(' ')
-        if any([x in arrtitle for x in arrsearch]):
+        arrtitle = [x.lower() for x in book.title.split(' ')]
+
+        if any([x.lower() in arrtitle for x in arrsearch]):
           self.text_books.append(book)       
   
   def next(self):
