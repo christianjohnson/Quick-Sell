@@ -1,12 +1,11 @@
-import xml.dom.minidom
+from xml.dom.minidom import parseString
 import urllib
+from book import Book
 import book
-import logging
 
 class isbndb:
   def __init__(self,isbndb_access_key='X5ANT93D'):
-    self.bookSite = 'http://isbndb.com/api/books.xml?'
-    self.access_key = isbndb_access_key
+    self.bookSite = Website('http://isbndb.com/api/books.xml?',isbndb_access_key)
 
   def searchBook(self, isbn=None, title=None, combined=None, full=None):
     """Searches for a book on isbndb.com using one of the above 
@@ -27,27 +26,60 @@ class isbndb:
     results, only the first page (10) results will
     be passed as a return from this function."""
     
-    url = self.bookSite+'access_key='+self.access_key+'&results=texts,details,prices&'
+    
+    xmlResponse = None
     if(isbn):
-      url+='&index1=isbn&value1='+isbn
-      logging.debug('URL::: %s'%(url))
-      xmlResponse = urllib.urlopen(url).read()
-    elif(title):
-      url+='&index1=title&value1='+title
-      xmlResponse = urllib.urlopen(url).read()
-    elif(combined):
-      url+='&index1=combined&value1='+combined
-      xmlResponse = urllib.urlopen(url).read()
-    elif(full):
-      url+='&index1=full&value1='+full
-      xmlResponse = urllib.urlopen(url).read()
-    else:
-      return []
-
+      xmlResponse = self.bookSite.searchISBN(isbn)
+    
+    if(title and not xmlResponse):
+      xmlResponse = self.bookSite.searchTitle(title)
+    
+    if(combined and not xmlResponse):
+      xmlResponse = self.bookSite.searchCombined(combined)
+    
+    if(full and not xmlResponse):
+      xmlResponse = self.bookSite.searchFull(full)
+      
+    print xmlResponse
     books = []
-    booksData = xml.dom.minidom.parseString(xmlResponse).getElementsByTagName('BookData')
+    parsedXML = parseString(xmlResponse)
+    bookParser = book.BookXMLParser()
+    
+    booksData = parsedXML.getElementsByTagName('BookData')
+    print len(booksData)
     for bookData in booksData:
-      books.append(book.Book(bookData))
+      books.append(bookParser.parse(bookData))
     return books
 
+class Website:
+  def __init__(self,site,accesskey):
+    self.site = site
+    self.accessKey = accesskey
+
+  def __str__(self):
+    return self.site+'access_key='+self.accessKey+'&results=texts,details,prices&'
+
+  def searchISBN(self, isbn):
+    return self.search('isbn',isbn)
+
+  def searchTitle(self, title):
+    return self.search('title',title)
+
+  def searchCombined(self, combined):
+    return self.search('combined',combined)
+  
+  def searchFull(self, full):
+    return self.search('full',full)
+
+  def search(self,indextype,value):
+    url = str(self)+'index1='+indextype+'&value1='+value
+    site = urllib.urlopen(url)
+    return site.read()
+
+
+if __name__ == '__main__':
+  isbnsearch = isbndb()
+  books = isbnsearch.searchBook(isbn='9781558607873')
+  for book in books:
+    print str(book)
 
