@@ -22,6 +22,8 @@ import isbndb.isbndb
 from search.search import Search as mySearch
 from books.uniqueBook import UniqueBook
 
+import logging
+
 
 #template.register_template_library('common.test_filter')
 
@@ -151,7 +153,40 @@ class SellBookForm(webapp2.RequestHandler):
       self.redirect("/browse")
     else:
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
+           
+class UserProfile(webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    if user:
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
+    else:
+      url = users.create_login_url(self.request.uri)
+      url_linktext = "Log In"
 
+    user_email = user.email()
+    
+    user_books = models.Book.all().filter('user = ', user)
+    
+    #logging.error("found %d books"%(len(user_books)))
+    
+    '''user_books = db.GqlQuery("Select *"
+                            "FROM book"
+                            "Where user= :user_email"
+                            )'''
+
+    template_values = {
+      'url' : url,
+      'url_linktext': url_linktext,
+      'email' : user.email(),
+      'nickname' : user.nickname(),
+      'user_books' :user_books,
+    }
+
+    template = jinja_environment.get_template('html/user.html')
+    self.response.out.write(template.render(template_values))
+    
+    
 class Search(webapp2.RequestHandler):
   def get(self):
     self.post()
@@ -208,6 +243,7 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/bookInformation', BookInformation),
                                ('/sell', SellBooks),
                                ('/sellBook', SellBookForm),
-                               ('/search',Search)], 
+                               ('/search',Search),
+                               ('/user', UserProfile)],
                                debug=True)
 

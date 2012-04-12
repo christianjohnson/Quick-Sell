@@ -17,3 +17,6 @@ class UniqueBook(db.Model):
   title = db.StringProperty(required=True)
   lastAdded = db.DateTimeProperty()
   sellpage = db.StringProperty(required=True)
+
+"""class User(db.Model):
+  username = db.UserProperty(required=True)"""

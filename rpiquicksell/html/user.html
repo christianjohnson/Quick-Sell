@@ -1,0 +1,29 @@
+{% extends "html/base.html" %}
+
+{% block nav %}
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active">
+                <a href="./">Overview</a>
+              </li>
+              <li class="">
+                <a href="./browse">Browse Books</a>
+              </li>
+              <li class="">
+                <a href="./sell">Sell Books</a>
+              </li>
+            </ul>
+          </div>
+{% endblock nav %}
+
+{% block content %}
+
+<!-- Masthead ================================================== -->
+<header class="jumbotron masthead">
+  <div class="inner">
+    <h1>HELLO {{nickname}}</h1>
+    {% for user_book in user_books %}
+      {{user_book.title}}
+    {% endfor %}
+    
+{% endblock content %}
