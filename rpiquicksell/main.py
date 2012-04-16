@@ -34,15 +34,15 @@ class MainHandler(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
     if user:
-			url = users.create_logout_url(self.request.uri)
-			url_linktext = 'Logout'
+	  url = users.create_logout_url(self.request.uri)
+	  url_linktext = 'Logout'
     else:
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
     template_values = {
       'url' : url,
-      'url_linktext': url_linktext
+      'url_linktext': url_linktext,
     }
 
     template = jinja_environment.get_template('html/index.html')
@@ -161,11 +161,11 @@ class UserProfile(webapp2.RequestHandler):
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Logout'
     else:
-      url = users.create_login_url(self.request.uri)
-      url_linktext = "Log In"
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+      
 
     user_email = user.email()
-    
     user_books = models.Book.all().filter('user = ', user)
     
     #logging.error("found %d books"%(len(user_books)))

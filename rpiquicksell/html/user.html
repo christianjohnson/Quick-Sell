@@ -21,9 +21,31 @@
 <!-- Masthead ================================================== -->
 <header class="jumbotron masthead">
   <div class="inner">
-    <h1>HELLO {{nickname}}</h1>
-    {% for user_book in user_books %}
-      {{user_book.title}}
-    {% endfor %}
+    <h2>HELLO {{nickname}}</h2>
+    <h3>Here are the books that you are currently selling:</h3>
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th><h2>Title</h2></th>
+            <th><h2>ISBN</h2></th>
+            <th><h2>Price</h2></th>
+            <th><h2>Condition</h2></th>
+            <th><h2>Edit</h2></th>
+          </tr>
+        </thead>
+        {% for user_book in user_books %}
+        <tbody>
+          <tr>
+            <td>{{ user_book.title }}</td>
+            <td>{{ user_book.isbn }}</td>
+            <td>${{ user_book.price }}</td>
+            <td>{{ user_book.condition }}</td>
+            <td>Edit</td>
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
+ 
     
+ </div>   
 {% endblock content %}
