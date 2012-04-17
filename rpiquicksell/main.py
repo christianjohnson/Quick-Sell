@@ -148,7 +148,7 @@ class SellBookForm(webapp2.RequestHandler):
                                  
       book_to_insert.put()
       
-      UniqueBook(text_isbn,title)
+      search = mySearch(text_isbn) # this will add the unique book if it doesn't exist
 
       self.redirect("/browse")
     else:
