@@ -92,6 +92,79 @@ class BookInformation(webapp2.RequestHandler):
     template = jinja_environment.get_template('html/bookinfo.html')
     self.response.out.write(template.render(template_values))
 
+class EditBook(webapp2.RequestHandler):
+  def get(self):
+    user = users.get_current_user()
+    if user:
+            url = users.create_logout_url(self.request.uri)
+            url_linktext = 'Welcome ' + user.nickname()
+    else:
+      url = users.create_login_url(self.request.uri)
+      url_linktext = 'Login'
+      
+    book_id = cgi.escape(self.request.get('id'))
+    book = models.Book.get(book_id)
+    
+    if not user == book.user:
+      self.redirect("/browse")
+      return   
+      
+    template_values = {
+      'url_linktext': url_linktext,
+      'book': book,
+      'book_id': book_id,
+      'isbn': book.isbn,
+      'title': book.title,
+      'email': book.user,
+      'price': book.price,
+      'condition': book.condition,
+    }
+
+    template = jinja_environment.get_template('html/edit.html')
+    self.response.out.write(template.render(template_values))
+
+class EditBookForm(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    #Form data
+    try:
+      isbn = ISBN(str(cgi.escape(self.request.get("isbn"))))
+      isbn.to_isbn13()
+      text_isbn = isbn.format('')
+    except ValueError:
+      text_isbn = None
+    title = cgi.escape(self.request.get("title"))
+    try:
+      price = float(cgi.escape(self.request.get("price")))
+    except BadValueError:
+      price = 0.0
+
+    condition = cgi.escape(self.request.get("condition"))
+    
+    book_id = cgi.escape(self.request.get("book_id"))
+    book = models.Book.get(book_id)
+    
+    if(book):
+      book.price=price
+      book.condition=condition
+      book.title=title
+      '''book_to_update= models.Book(isbn=text_isbn, 
+                                 title=title, 
+                                 price=price,
+                                 condition=condition,
+                                 user=user,
+                                 is_local=True)'''
+      book.put()
+      
+      self.redirect("/user")
+    else:
+      self.redirect('/edit?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
+      
+      
 class SellBooks(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
@@ -167,9 +240,7 @@ class UserProfile(webapp2.RequestHandler):
 
     user_email = user.email()
     user_books = models.Book.all().filter('user = ', user)
-    
-    #logging.error("found %d books"%(len(user_books)))
-    
+
     '''user_books = db.GqlQuery("Select *"
                             "FROM book"
                             "Where user= :user_email"
@@ -203,7 +274,7 @@ class Search(webapp2.RequestHandler):
       url_linktext = "Log In"
     
     text_isbn = str(cgi.escape(self.request.get('search')))
-    logging.info(text_isbn)
+    #logging.info(text_isbn)
     #try:
     search = mySearch(text_isbn)
     (search_type,arg1,arg2) = search.next()
@@ -244,6 +315,8 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/sell', SellBooks),
                                ('/sellBook', SellBookForm),
                                ('/search',Search),
-                               ('/user', UserProfile)],
+                               ('/user', UserProfile),
+                               ('/edit', EditBook),
+                               ('/editBook', EditBookForm)],
                                debug=True)
 

@@ -40,7 +40,9 @@
             <td>{{ user_book.isbn }}</td>
             <td>${{ user_book.price }}</td>
             <td>{{ user_book.condition }}</td>
-            <td>Edit</td>
+            
+            <td><a href="./edit?id={{user_book.key()}}">Edit</a></td>
+            
           </tr>
         </tbody>
         {% endfor %}
