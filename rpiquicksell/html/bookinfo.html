@@ -6,11 +6,17 @@
               <li class="">
                 <a href="./">Overview</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./browse">Browse Books</a>
               </li>
               <li class="">
                 <a href="./sell">Sell Books</a>
+              </li>
+              <li class="">
+                <a href="./recentBook">Recently Sold</a>
+              </li>
+              <li class="">
+                <a href="./user">Profile</a>
               </li>
             </ul>
           </div>
@@ -28,7 +34,7 @@
             <th><h2>ISBN</h2></th>
             <th><h2>Price</h2></th>
             <th><h2>Condition</h2></th>
-            <th><h2>Seller</h2></th>
+            <th><h2>Contact Seller</h2></th>
           </tr>
         </thead>
         <tbody>
@@ -37,7 +43,7 @@
             <td>{{ book.isbn }}</td>
             <td>${{ book.price }}</td>
             <td>{{ book.condition }}</td>
-            <td>{{ book.user }}</td>
+            <td><a href="mailto:{{ email }}">{{email}}</a></td>
           </tr>
         </tbody>
       </table>

@@ -3,7 +3,7 @@
 {% block nav %}
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="active">
+              <li class="">
                 <a href="./">Overview</a>
               </li>
               <li class="">
@@ -11,6 +11,12 @@
               </li>
               <li class="">
                 <a href="./sell">Sell Books</a>
+              </li>
+              <li class="">
+                <a href="./recentBook">Recently Sold</a>
+              </li>
+              <li class="active">
+                <a href="./user">Profile</a>
               </li>
             </ul>
           </div>
@@ -31,23 +37,50 @@
             <th><h2>Price</h2></th>
             <th><h2>Condition</h2></th>
             <th><h2>Edit</h2></th>
+            <th><h2>Remove</h2></th>
           </tr>
         </thead>
         {% for user_book in user_books %}
         <tbody>
           <tr>
+          	{%if user_book.sold_date==None %}
             <td>{{ user_book.title }}</td>
             <td>{{ user_book.isbn }}</td>
             <td>${{ user_book.price }}</td>
             <td>{{ user_book.condition }}</td>
-            
             <td><a href="./edit?id={{user_book.key()}}">Edit</a></td>
+            <td><a href="./remove?id={{user_book.key()}}">X</a></td>
+            {%endif %}
             
           </tr>
         </tbody>
         {% endfor %}
       </table>
- 
-    
+      <br/>
+      <br/>
+      <h3>Here are the books that you sold successfully:</h3>
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th><h2>Title</h2></th>
+            <th><h2>ISBN</h2></th>
+            <th><h2>Price</h2></th>
+            <th><h2>Condition</h2></th>
+          </tr>
+        </thead>
+        {% for user_book in user_books %}
+        <tbody>
+          <tr>
+          	{%if user_book.sold_date!=None %}
+            <td>{{ user_book.title }}</td>
+            <td>{{ user_book.isbn }}</td>
+            <td>${{ user_book.price }}</td>
+            <td>{{ user_book.condition }}</td>
+            {%endif %}
+            
+          </tr>
+        </tbody>
+        {% endfor %}
+      </table>
  </div>   
 {% endblock content %}
