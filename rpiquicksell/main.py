@@ -31,6 +31,9 @@ jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 class MainHandler(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
@@ -42,6 +45,7 @@ class MainHandler(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+#the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -52,6 +56,9 @@ class MainHandler(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class BrowseBooks(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
@@ -63,8 +70,10 @@ class BrowseBooks(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+    #get all books from database
     books = models.UniqueBook.all().order('-lastAdded')
     
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -76,6 +85,9 @@ class BrowseBooks(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class BookInformation(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
@@ -87,10 +99,11 @@ class BookInformation(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
       
+      #get book from db
     book_id = cgi.escape(self.request.get('id'))
-
     book = models.Book.get(book_id)
 
+#the values passed to html
     template_values = {
       'url_linktext': url_linktext,
       'url': url,
@@ -103,6 +116,8 @@ class BookInformation(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class EditBook(webapp2.RequestHandler):
+    #Check if logged in, if not re-direct to log in page
+    #If logged in generate nickname and logout link
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -113,13 +128,16 @@ class EditBook(webapp2.RequestHandler):
           url = users.create_logout_url(self.request.uri)
           url_linktext = 'Logout'
       
+      #get book from db
     book_id = cgi.escape(self.request.get('id'))
     book = models.Book.get(book_id)
     
+    #check if correct user
     if not user == book.user:
       self.redirect("/browse")
       return   
-      
+
+#the values passed to html      
     template_values = {
       'url_linktext': url_linktext,
       'book': book,
@@ -136,6 +154,8 @@ class EditBook(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class EditBookForm(webapp2.RequestHandler):
+    #Check if logged in
+    #If logged in generate nickname and logout link
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -160,7 +180,8 @@ class EditBookForm(webapp2.RequestHandler):
     
     book_id = cgi.escape(self.request.get("book_id"))
     book = models.Book.get(book_id)
-    
+
+#the values passed to html    
     if(book):
       book.price=price
       book.condition=condition
@@ -178,6 +199,8 @@ class EditBookForm(webapp2.RequestHandler):
       self.redirect('/edit?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class RemoveBook(webapp2.RequestHandler):
+        #Check if logged in, if not re-direct to log in page
+    #If logged in generate nickname and logout link
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -188,14 +211,15 @@ class RemoveBook(webapp2.RequestHandler):
           url = users.create_logout_url(self.request.uri)
           url_linktext = 'Logout'
     
-    
+    #get book from db
     book_id = cgi.escape(self.request.get('id'))
     book = models.Book.get(book_id)
     
+    #check correct user
     if not user == book.user:
       self.redirect("/browse")
       return   
-      
+#the values passed to html      
     template_values = {
       'url_linktext': url_linktext,
       'url': url,
@@ -213,6 +237,8 @@ class RemoveBook(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class RemoveBookForm(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -246,6 +272,8 @@ class RemoveBookForm(webapp2.RequestHandler):
      
       
 class SellBooks(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -256,7 +284,7 @@ class SellBooks(webapp2.RequestHandler):
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Log Out'
     
-    
+ #the values passed to html   
     template_values = {
       'url' : url,
       'url_linktext' : url_linktext,
@@ -272,6 +300,8 @@ class SellBooks(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class SellBookForm(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -310,6 +340,9 @@ class SellBookForm(webapp2.RequestHandler):
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class RecentSoldBooks(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
@@ -320,10 +353,12 @@ class RecentSoldBooks(webapp2.RequestHandler):
       nickname = ""
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
-
+      
+      #get book from db
     books = models.Book.all().order('-sold_date')
     books
     
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -336,6 +371,8 @@ class RecentSoldBooks(webapp2.RequestHandler):
     
                
 class UserProfile(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
   def get(self):
     user = users.get_current_user()
     if user:
@@ -346,10 +383,11 @@ class UserProfile(webapp2.RequestHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
       
-
+    #get book db
     user_email = user.email()
     user_books = models.Book.all().filter('user = ', user)
 
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -367,8 +405,10 @@ class Search(webapp2.RequestHandler):
   def get(self):
     self.post()
 
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def post(self):
-    
     user = users.get_current_user()
 
     if user:
