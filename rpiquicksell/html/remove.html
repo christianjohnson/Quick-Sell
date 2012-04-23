@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+{% extends "html/base.html" %}
+
+{% block extra_script %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#sellBook").validate({
+    errorClass: "error",
+    validClass: "success",
+    errorElement: "span",
+        highlight: function (element, errorClass, validClass) { 
+  $(element).parents("div[class='clearfix']").addClass(errorClass).removeClass(validClass); 
+        }, 
+        unhighlight: function (element, errorClass, validClass) { 
+            $(element).parents(".error").removeClass(errorClass).addClass(validClass); 
+        }
+  });
+});
+</script>
+{% endblock %}
+
+{% block nav %}
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="">
+                <a href="./">Overview</a>
+              </li>
+              <li class="">
+                <a href="./browse">Browse Books</a>
+              </li>
+              <li class="">
+                <a href="./sell">Sell Books</a>
+              </li>
+              <li class="">
+                <a href="./recentBook">Recently Sold</a>
+              </li>
+              <li class="active">
+                <a href="./user">Profile</a>
+              </li>
+            </ul>
+          </div>
+{% endblock nav %}
+
+{% block content %}
+
+<div class="marketing">
+ <h1>Tell us how your transaction went:</h1>
+  {% if badisbn %}
+   <p>Sorry, that ISBN you entered wasn't valid.</p>
+  {% endif %}
+  <div class="row">
+  	
+    <div class="span8 offset2">
+      <form id="removebook" class="well" action="/removeBook" method="post">
+      	<label>Success?</label>
+      	<input type="radio" name="success" value="True" /> Yes, I sold my book<br />
+		<input type="radio" name="success" value="False" /> No, I did not
+        <label>Final Price</label>
+        $<input name="price" type="text" class="span3 required"{% if price %} value={{ price }} {% else %} placeholder="Price" {% endif %}>
+        <label>Comments: (Optional)</label>
+        <input name="comment" id="textarea" class="input-xlarge" rows="3" placeholder="Tell us about your experience">
+        <!--hidden Book_id-->
+        <input name="book_id" type="hidden" class="span3 required" readonly="true" {% if book_id %} value={{ book_id }} {% else %} placeholder="ISBN" {% endif %}>   
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div><!--/row-->
+</div><!-- /.marketing -->
+
+{% endblock content %}
