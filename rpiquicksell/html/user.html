@@ -25,10 +25,11 @@
 {% block content %}
 
 <!-- Masthead ================================================== -->
-<header class="jumbotron masthead">
-  <div class="inner">
+<div class="marketing">
+  <center>
     <h2>HELLO {{nickname}}</h2>
     <h3>Here are the books that you are currently selling:</h3>
+  </center>
     <table class="table table-striped">
         <thead>
           <tr>
@@ -58,7 +59,7 @@
       </table>
       <br/>
       <br/>
-      <h3>Here are the books that you sold successfully:</h3>
+      <center><h3>Here are the books that you sold successfully:</h3></center>
     <table class="table table-striped">
         <thead>
           <tr>
@@ -82,5 +83,5 @@
         </tbody>
         {% endfor %}
       </table>
- </div>   
+</div>
 {% endblock content %}
