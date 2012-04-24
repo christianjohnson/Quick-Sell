@@ -6,13 +6,13 @@
               <li class="">
                 <a href="./">Overview</a>
               </li>
-              <li class="active">
+              <li class="">
                 <a href="./browse">Browse Books</a>
               </li>
               <li class="">
                 <a href="./sell">Sell Books</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./recentBook">Recently Sold</a>
               </li>
               <li class="">
@@ -27,16 +27,9 @@
 
 <div class="marketing">
   <center>
-    <form class="form-search" action="./search" method="post">
-      <input class="search-query" placeholder="isbn search" tabindex="1" type="text" maxlength="140" size="28" value="" name="search">
-      <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-  </center>
-  {% if search_text %}
-  <h1>Search: {{search_text}}</h1> 
-  {% else %}
-  <h1>Books for sale:</h1>
-  {% endif %}
+    
+  
+  <h1>Recent Sales:</h1>
   <div class="row">
     <div class="span8 offset2" id="books">
       <table class="table table-striped">
@@ -44,21 +37,28 @@
           <tr>
             <th><h2>Title</h2></th>
             <th></th>
-            <th><h2>Date</h2></th>
+            <th><h2>Price</h2></th>
+            <th><h2>Date Sold</h2></th>
           </tr>
         </thead>
         <tbody>
           {% for book in books %}
+            {%if book.sold_date!=None %}
           <tr>
             <td>
               <a href="./search?search={{ book.isbn }}">{{ book.title }}</a>
             </td>
             <td>
             <a href="{{ book.sellpage }}">sell this book</a>
+           </td>
+           <td>
+            {{ book.price }}
+            </td>
             <td>
-            {{ book.lastAdded }}
+            {{ book.sold_date }}
             </td>
           </tr>  
+            {% endif %}
           {% endfor %}
         </tbody>
       </table>

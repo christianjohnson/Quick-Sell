@@ -35,7 +35,7 @@ $(document).ready(function(){
               <li class="">
                 <a href="./recentBook">Recently Sold</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./user">Profile</a>
               </li>
             </ul>
@@ -51,9 +51,9 @@ $(document).ready(function(){
   {% endif %}
   <div class="row">
     <div class="span8 offset2">
-      <form id="sellBook" class="well" action="/sellBook" method="post">  
+      <form id="editBook" class="well" action="/editBook" method="post">  
         <label>ISBN</label>  
-        <input name="isbn" type="text" class="span3 required" {% if isbn %} value={{ isbn }} {% else %} placeholder="ISBN" {% endif %}>   
+        <input name="isbn" type="text" class="span3 required" readonly="true" {% if isbn %} value={{ isbn }} {% else %} placeholder="ISBN" {% endif %}>
         <label>Book Title</label>  
         <input for="ccomment" name="title" type="text" class="required span3" {% if title %} value="{{title}}" {% else %} placeholder="Book Title" {% endif %}>
         <label>Price</label>  
@@ -67,8 +67,11 @@ $(document).ready(function(){
         </select>
         <label>Email</label>  
         <input name="email" type="text" class="span3" readonly="true" placeholder="{{ email }}">
+        
+        <!--hidden Book_id-->
+        <input name="book_id" type="hidden" class="span3 required" readonly="true" {% if book_id %} value={{ book_id }} {% else %} placeholder="ISBN" {% endif %}>   
         <br>
-        <button type="submit" class="btn btn-primary">Submit</button>  
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>
   </div><!--/row-->

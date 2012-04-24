@@ -29,13 +29,13 @@ $(document).ready(function(){
               <li class="">
                 <a href="./browse">Browse Books</a>
               </li>
-              <li class="active">
+              <li class="">
                 <a href="./sell">Sell Books</a>
               </li>
               <li class="">
                 <a href="./recentBook">Recently Sold</a>
               </li>
-              <li class="">
+              <li class="active">
                 <a href="./user">Profile</a>
               </li>
             </ul>
@@ -45,30 +45,25 @@ $(document).ready(function(){
 {% block content %}
 
 <div class="marketing">
- <h1>Give us some information:</h1>
+ <h1>Tell us how your transaction went:</h1>
   {% if badisbn %}
    <p>Sorry, that ISBN you entered wasn't valid.</p>
   {% endif %}
   <div class="row">
+  	
     <div class="span8 offset2">
-      <form id="sellBook" class="well" action="/sellBook" method="post">  
-        <label>ISBN</label>  
-        <input name="isbn" type="text" class="span3 required" {% if isbn %} value={{ isbn }} {% else %} placeholder="ISBN" {% endif %}>   
-        <label>Book Title</label>  
-        <input for="ccomment" name="title" type="text" class="required span3" {% if title %} value="{{title}}" {% else %} placeholder="Book Title" {% endif %}>
-        <label>Price</label>  
+      <form id="removebook" class="well" action="/removeBook" method="post">
+      	<label>Success?</label>
+      	<input type="radio" name="success" value="True" /> Yes, I sold my book<br />
+		<input type="radio" name="success" value="False" /> No, I did not
+        <label>Final Price</label>
         $<input name="price" type="text" class="span3 required"{% if price %} value={{ price }} {% else %} placeholder="Price" {% endif %}>
-        <label>Condition</label>
-        <select name="condition">
-          <option>Poor</option>
-          <option>Heavily Used</option>
-          <option selected='selected'>Lightly Used</option>
-          <option>Brand New</option>
-        </select>
-        <label>Email</label>  
-        <input name="email" type="text" class="span3" readonly="true" placeholder="{{ email }}">
+        <label>Comments: (Optional)</label>
+        <input name="comment" id="textarea" class="input-xlarge" rows="3" placeholder="Tell us about your experience">
+        <!--hidden Book_id-->
+        <input name="book_id" type="hidden" class="span3 required" readonly="true" {% if book_id %} value={{ book_id }} {% else %} placeholder="ISBN" {% endif %}>   
         <br>
-        <button type="submit" class="btn btn-primary">Submit</button>  
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>
   </div><!--/row-->

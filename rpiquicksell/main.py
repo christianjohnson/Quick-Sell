@@ -31,78 +31,260 @@ jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 class MainHandler(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
-	  url = users.create_logout_url(self.request.uri)
-	  url_linktext = 'Logout'
+      nickname = user.nickname()
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
     else:
+      nickname = ""
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+#the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
+      'nickname' : nickname
     }
 
     template = jinja_environment.get_template('html/index.html')
     self.response.out.write(template.render(template_values))
     
 class BrowseBooks(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
-			url = users.create_logout_url(self.request.uri)
-			url_linktext = 'Logout'
+      nickname = user.nickname()
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
     else:
+      nickname = ""
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+    #get all books from database
     books = models.UniqueBook.all().order('-lastAdded')
     
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
-      'books': books
+      'books': books,
+      'nickname' : nickname
     }
 
     template = jinja_environment.get_template('html/browse.html')
     self.response.out.write(template.render(template_values))
     
 class BookInformation(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
-			url = users.create_logout_url(self.request.uri)
-			url_linktext = 'Welcome ' + user.nickname()
-			user = users.get_current_user()
+      nickname = user.nickname()
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
     else:
+      nickname = ""
       url = users.create_login_url(self.request.uri)
-      url_linktext = 'Login'
+      url_linktext = "Log In"
       
+      #get book from db
     book_id = cgi.escape(self.request.get('id'))
-
     book = models.Book.get(book_id)
 
+#the values passed to html
     template_values = {
       'url_linktext': url_linktext,
-      'book': book
+      'url': url,
+      'book': book,
+      'email': book.user.email(),
+      'nickname' : nickname
     }
 
     template = jinja_environment.get_template('html/bookinfo.html')
     self.response.out.write(template.render(template_values))
 
-class SellBooks(webapp2.RequestHandler):
+class EditBook(webapp2.RequestHandler):
+    #Check if logged in, if not re-direct to log in page
+    #If logged in generate nickname and logout link
   def get(self):
     user = users.get_current_user()
     if not user:
       self.redirect(users.create_login_url(self.request.uri))
       return
     else:  
-  		url = users.create_logout_url(self.request.uri)
-  		url_linktext = 'Welcome ' + user.nickname()
+          nickname = user.nickname()
+          url = users.create_logout_url(self.request.uri)
+          url_linktext = 'Logout'
+      
+      #get book from db
+    book_id = cgi.escape(self.request.get('id'))
+    book = models.Book.get(book_id)
     
+    #check if correct user
+    if not user == book.user:
+      self.redirect("/browse")
+      return   
+
+#the values passed to html      
+    template_values = {
+      'url_linktext': url_linktext,
+      'book': book,
+      'book_id': book_id,
+      'isbn': book.isbn,
+      'title': book.title,
+      'email': book.user,
+      'price': book.price,
+      'condition': book.condition,
+      'nickname' : nickname
+    }
+
+    template = jinja_environment.get_template('html/edit.html')
+    self.response.out.write(template.render(template_values))
+
+class EditBookForm(webapp2.RequestHandler):
+    #Check if logged in
+    #If logged in generate nickname and logout link
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      nickname = user.nickname()
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    #Form data
+    try:
+      isbn = ISBN(str(cgi.escape(self.request.get("isbn"))))
+      isbn.to_isbn13()
+      text_isbn = isbn.format('')
+    except ValueError:
+      text_isbn = None
+    title = cgi.escape(self.request.get("title"))
+    try:
+      price = float(cgi.escape(self.request.get("price")))
+    except BadValueError:
+      price = 0.0
+
+    condition = cgi.escape(self.request.get("condition"))
     
+    book_id = cgi.escape(self.request.get("book_id"))
+    book = models.Book.get(book_id)
+
+#the values passed to html    
+    if(book):
+      book.price=price
+      book.condition=condition
+      book.title=title
+      '''book_to_update= models.Book(isbn=text_isbn, 
+                                 title=title, 
+                                 price=price,
+                                 condition=condition,
+                                 user=user,
+                                 is_local=True)'''
+      book.put()
+      
+      self.redirect("/user")
+    else:
+      self.redirect('/edit?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
+
+class RemoveBook(webapp2.RequestHandler):
+        #Check if logged in, if not re-direct to log in page
+    #If logged in generate nickname and logout link
+  def get(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+    else:  
+          nickname = user.nickname()
+          url = users.create_logout_url(self.request.uri)
+          url_linktext = 'Logout'
+    
+    #get book from db
+    book_id = cgi.escape(self.request.get('id'))
+    book = models.Book.get(book_id)
+    
+    #check correct user
+    if not user == book.user:
+      self.redirect("/browse")
+      return   
+#the values passed to html      
+    template_values = {
+      'url_linktext': url_linktext,
+      'url': url,
+      'book': book,
+      'book_id': book_id,
+      'isbn': book.isbn,
+      'title': book.title,
+      'email': book.user,
+      'price': book.price,
+      'condition': book.condition,
+      'nickname' : nickname
+    }
+
+    template = jinja_environment.get_template('html/remove.html')
+    self.response.out.write(template.render(template_values))
+
+class RemoveBookForm(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    
+    nickname = user.nickname()
+    book_id = cgi.escape(self.request.get("book_id"))
+    book = models.Book.get(book_id)
+    
+    success= cgi.escape(self.request.get("success"))
+    #price= cgi.escape(self.request.get("price"))
+    
+    try:
+      price = float(cgi.escape(self.request.get("price")))
+    except BadValueError:
+      price = 0.0
+         
+    if(book):
+      if (success=="True"):
+        book.sold_date=datetime.datetime.now()
+        book.price=price
+        book.put()
+        self.redirect("/user")
+      else:
+        book.delete()
+        self.redirect("/user")
+    else:
+      self.redirect("/user")
+     
+      
+class SellBooks(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
+  def get(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+    else:
+      nickname = user.nickname()
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Log Out'
+    
+ #the values passed to html   
     template_values = {
       'url' : url,
       'url_linktext' : url_linktext,
@@ -110,13 +292,16 @@ class SellBooks(webapp2.RequestHandler):
       'badisbn' : cgi.escape(self.request.get('badisbn')),
       'title' : cgi.escape(self.request.get('title')),
       'price' : cgi.escape(self.request.get('price')),
-      'isbn' : cgi.escape(self.request.get('isbn'))
+      'isbn' : cgi.escape(self.request.get('isbn')),
+      'nickname' : nickname
     }
 
     template = jinja_environment.get_template('html/sell.html')
     self.response.out.write(template.render(template_values))
     
 class SellBookForm(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -153,34 +338,63 @@ class SellBookForm(webapp2.RequestHandler):
       self.redirect("/browse")
     else:
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
-           
-class UserProfile(webapp2.RequestHandler):
+
+class RecentSoldBooks(webapp2.RequestHandler):
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def get(self):
     user = users.get_current_user()
     if user:
+      nickname = user.nickname()
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
+    else:
+      nickname = ""
+      url = users.create_login_url(self.request.uri)
+      url_linktext = "Log In"
+      
+      #get book from db
+    books = models.Book.all().order('-sold_date')
+    books
+    
+    #the values passed to html
+    template_values = {
+      'url' : url,
+      'url_linktext': url_linktext,
+      'books': books,
+      'nickname' : nickname
+    }
+
+    template = jinja_environment.get_template('html/recentBook.html')
+    self.response.out.write(template.render(template_values))
+    
+               
+class UserProfile(webapp2.RequestHandler):
+        #Check if logged in
+    #If logged in generate nickname and logout link
+  def get(self):
+    user = users.get_current_user()
+    if user:
+      nickname = user.nickname()
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Logout'
     else:
       self.redirect(users.create_login_url(self.request.uri))
       return
       
-
+    #get book db
     user_email = user.email()
     user_books = models.Book.all().filter('user = ', user)
-    
-    #logging.error("found %d books"%(len(user_books)))
-    
-    '''user_books = db.GqlQuery("Select *"
-                            "FROM book"
-                            "Where user= :user_email"
-                            )'''
 
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
       'email' : user.email(),
       'nickname' : user.nickname(),
       'user_books' :user_books,
+      'nickname' : nickname
     }
 
     template = jinja_environment.get_template('html/user.html')
@@ -191,19 +405,23 @@ class Search(webapp2.RequestHandler):
   def get(self):
     self.post()
 
+    #Get the user information
+    #if logged get nickname and generate log out link
+    #if not logged in no nickname and geneate log in link
   def post(self):
-    
     user = users.get_current_user()
 
     if user:
+      nickname = user.nickname()
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Logout'
     else:
+      nickname = ""
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
     
     text_isbn = str(cgi.escape(self.request.get('search')))
-    logging.info(text_isbn)
+    #logging.info(text_isbn)
     #try:
     search = mySearch(text_isbn)
     (search_type,arg1,arg2) = search.next()
@@ -218,6 +436,7 @@ class Search(webapp2.RequestHandler):
         'url' : url,
         'url_linktext': url_linktext,
         'books': books,
+        'nickname' : nickname,
         'bookTitle':arg1,
         'text_isbn':text_isbn,
         'book_not_found':books==[]
@@ -244,6 +463,11 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/sell', SellBooks),
                                ('/sellBook', SellBookForm),
                                ('/search',Search),
-                               ('/user', UserProfile)],
+                               ('/user', UserProfile),
+                               ('/edit', EditBook),
+                               ('/editBook', EditBookForm),
+                               ('/remove', RemoveBook),
+                               ('/removeBook', RemoveBookForm),
+                               ('/recentBook', RecentSoldBooks)],
                                debug=True)
 
