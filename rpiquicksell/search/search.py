@@ -28,8 +28,11 @@ class Search(object):
         isbnbooks = isbndb_query.searchBook(isbn=self.isbn.format(''))
         
         logging.info('found %d books on isbndb'%len(isbnbooks))
-
-        UniqueBook(self.isbn.format(''),isbnbooks[0].title)
+        
+        if(len(isbnbooks) == 0):
+          UniqueBook(self.isbn.format(''),'ISBN is valid, but book not found on isbndb')
+        else:
+          UniqueBook(self.isbn.format(''),isbnbooks[0].title)
         for book in isbnbooks:
           book.add_to_database(self.isbn.format(''))
       else:

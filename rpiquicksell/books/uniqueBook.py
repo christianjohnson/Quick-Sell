@@ -10,6 +10,8 @@ class UniqueBook(object):
       self.book = book
       self.isbn = book.isbn
       self.title = book.title
+      if(title != '' and title != book.title):
+        self.update_title(title)
     else:
       book = models.UniqueBook(isbn=isbn,
                                title=title,
