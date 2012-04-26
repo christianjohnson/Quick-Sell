@@ -46,7 +46,7 @@
             {%if book.sold_date!=None %}
           <tr>
             <td>
-              <a href="./search?search={{ book.isbn }}">{{ book.title }}</a>
+              <a href="./search?search={{ book.unique.isbn }}">{{ book.unique.title }}</a>
             </td>
             <td>
             <a href="{{ book.sellpage }}">sell this book</a>

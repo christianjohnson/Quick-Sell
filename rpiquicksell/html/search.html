@@ -43,7 +43,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th><h2>Title</h2></th>
+            <th><h2>Description</h2></th>
             <th><h2>Condition</h2></th>
             <th><h2>Price</h2></th>
           </tr>
@@ -54,7 +54,7 @@
               {%if book.sold_date==None %}
           <tr>
             <td>
-              <a href="./bookInformation?id={{book.key()}}">{{ book.title }}</a>
+              <a href="./bookInformation?id={{book.key()}}">{% if book.description %} {{ book.description }} {% else %} No description {% endif %}</a>
             </td>
             <td>{{ book.condition }}</td>
             <td>${{ "%.2f" | format(book.price) }}</td>
@@ -71,7 +71,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th><h2>Title</h2></th>
+            <th><h2>Site</h2></th>
             <th><h2>Price</h2></th>
           </tr>
         </thead>
@@ -80,7 +80,7 @@
           {% if not book.is_local %}
           <tr>
             <td>
-              <a href={{book.url}}>{{ book.title }} at {% if book.external_store %}{{ book.external_store }} {% else %} Unknown {% endif %}</a>
+              <a href={{book.url}}>{% if book.external_store %}{{ book.external_store }} {% else %} Unknown {% endif %}</a>
             </td>
             <td>${{ "%.2f" | format(book.price) }}</td>
           </tr>  

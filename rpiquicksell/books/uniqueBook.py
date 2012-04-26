@@ -10,18 +10,24 @@ class UniqueBook(object):
       self.book = book
       self.isbn = book.isbn
       self.title = book.title
+      self.found = True
       if(title != '' and title != book.title):
         self.update_title(title)
     else:
-      book = models.UniqueBook(isbn=isbn,
-                               title=title,
-                               lastAdded = datetime.datetime.now(),
-                               sellpage = '/sell?'+urllib.urlencode(
-                                  {'isbn':isbn,'title':title}))
-      book.put()
-      self.book = book
+      self.found = False
+      self.book = None
       self.isbn = isbn
       self.title = title
+  
+  def create_book(self,title):
+    if(self.found):
+      return
+    self.title = title
+    self.book = models.UniqueBook(isbn = self.isbn,
+                             title = self.title,
+                             lastAdded = datetime.datetime.now(),
+                             sellpage = self.sell_page())
+    self.book.put()
 
   def update_date(self):
     self.book.lastAdded = datetime.datetime.now()
@@ -36,3 +42,11 @@ class UniqueBook(object):
   
   def sell_page(self):
     return '/sell?'+urllib.urlencode({'isbn':self.isbn,'title':self.title})
+
+
+  def get_local_books(self):
+    return self.book.books.filter('is_local =',True).filter('sold_date =', None).order('-date')
+
+  def get_remote_books(self):
+    return self.book.books.filter('is_local =',False).order('-date')
+

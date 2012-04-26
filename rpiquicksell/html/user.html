@@ -44,8 +44,8 @@
         <tbody>
           <tr>
           	{%if user_book.sold_date==None %}
-            <td>{{ user_book.title }}</td>
-            <td>{{ user_book.isbn }}</td>
+            <td>{{ user_book.unique.title }}</td>
+            <td>{{ user_book.unique.isbn }}</td>
             <td>${{ user_book.price }}</td>
             <td>{{ user_book.condition }}</td>
             <td><a href="./edit?id={{user_book.key()}}">Edit</a></td>
@@ -72,8 +72,8 @@
         <tbody>
           <tr>
           	{%if user_book.sold_date!=None %}
-            <td>{{ user_book.title }}</td>
-            <td>{{ user_book.isbn }}</td>
+            <td>{{ user_book.unique.title }}</td>
+            <td>{{ user_book.unique.isbn }}</td>
             <td>${{ user_book.price }}</td>
             <td>{{ user_book.condition }}</td>
             {%endif %}

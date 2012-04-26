@@ -51,13 +51,14 @@ class Book:
     for price in price_list:
       self.prices.append(StorePrice(price))
   
-  def add_to_database(self,isbn):
+  def add_to_database(self,unique):
     logging.info('add_to_database')
     for _price in self.prices:
       logging.info(_price.isHistoric)
       if(not _price.isHistoric):
         logging.info(str(_price))
-        book_to_add = models.Book(isbn = isbn,
+        book_to_add = models.Book(
+                    unique=unique,
                     title=self.title,
                     is_local=False,
                     price=_price.price,

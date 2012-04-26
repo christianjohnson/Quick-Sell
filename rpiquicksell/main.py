@@ -34,11 +34,11 @@ jinja_environment = jinja2.Environment(
 
 
 class MainHandler(webapp2.RequestHandler):
-    """Handles the main website.
+  """Handles the main website.
 
        Args:
            webapp2.requestHandler: the webapp request to serve.
-    """
+  """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -153,8 +153,8 @@ class EditBook(webapp2.RequestHandler):
       'url_linktext': url_linktext,
       'book': book,
       'book_id': book_id,
-      'isbn': book.isbn,
-      'title': book.title,
+      'isbn': book.unique.isbn,
+      'title': book.unique.title,
       'email': book.user,
       'price': book.price,
       'condition': book.condition,
@@ -238,8 +238,8 @@ class RemoveBook(webapp2.RequestHandler):
       'url': url,
       'book': book,
       'book_id': book_id,
-      'isbn': book.isbn,
-      'title': book.title,
+      'isbn': book.unique.isbn,
+      'title': book.unique.title,
       'email': book.user,
       'price': book.price,
       'condition': book.condition,
@@ -337,7 +337,7 @@ class SellBookForm(webapp2.RequestHandler):
       text_isbn = isbn.format('')
     except ValueError:
       text_isbn = None
-    title = cgi.escape(self.request.get("title"))
+    description = cgi.escape(self.request.get("description"))
     try:
       price = float(cgi.escape(self.request.get("price")))
     except BadValueError:
@@ -346,8 +346,11 @@ class SellBookForm(webapp2.RequestHandler):
     condition = cgi.escape(self.request.get("condition"))
     
     if(text_isbn):
-      book_to_insert = models.Book(isbn=text_isbn, 
-                                 title=title, 
+      # this will add the unique book if it doesn't exist
+      search = mySearch(text_isbn)
+      
+      book_to_insert = models.Book(unique=search.unique_book().book, 
+                                 description=description, 
                                  price=price,
                                  condition=condition,
                                  user=user,
@@ -355,8 +358,6 @@ class SellBookForm(webapp2.RequestHandler):
                                  
       book_to_insert.put()
       
-      # this will add the unique book if it doesn't exist
-      search = mySearch(text_isbn)
       self.redirect("/browse")
     else:
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))

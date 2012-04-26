@@ -25,7 +25,28 @@ indexes:
 
 - kind: Book
   properties:
+  - name: is_local
+  - name: sold_date
+  - name: unique
+  - name: date
+    direction: desc
+
+- kind: Book
+  properties:
+  - name: is_local
+  - name: unique
+  - name: date
+    direction: desc
+
+- kind: Book
+  properties:
   - name: isbn
+  - name: date
+    direction: desc
+
+- kind: Book
+  properties:
+  - name: unique
   - name: date
     direction: desc
 

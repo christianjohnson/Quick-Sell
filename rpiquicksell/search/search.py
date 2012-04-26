@@ -48,9 +48,11 @@ class Search(object):
       self.isbn = isbn
       self.isbn_search = True
       self.isbn.to_isbn13()
+      self.unique = UniqueBook(self.isbn.format(''))
       remote_books = models.Book.all().filter('isbn =',self.isbn.format('')).filter('is_local =', False).filter('date >=',datetime.datetime.now()-datetime.timedelta(days=10)).order('-date').get()
       
-      if not remote_books:
+      if not self.unique.found:
+      
         isbndb_query = isbndb()
         
         logging.info('making query to isbndb')
@@ -60,19 +62,18 @@ class Search(object):
         logging.info('found %d books on isbndb'%len(isbnbooks))
         
         if(len(isbnbooks) == 0):
-          UniqueBook(self.isbn.format(''),'ISBN is valid, but book not found on isbndb')
+          self.unique.create_book('ISBN valid, but book not found')
         else:
-          UniqueBook(self.isbn.format(''),isbnbooks[0].title)
+          self.unique.create_book(isbnbooks[0].title)
         
         for book in isbnbooks:
-          book.add_to_database(self.isbn.format(''))
-      else:
-        uniquebook = UniqueBook(self.isbn.format(''),remote_books.title)
-        self.title = uniquebook.title
+          book.add_to_database(self.unique.book)
 
-      self.local_books = models.Book.all().filter('isbn =', self.isbn.format('')).filter('is_local =', True).order('-date')
-      self.remote_books = models.Book.all().filter('isbn =', self.isbn.format('')).filter('is_local =', False).order('-date')
-    
+      self.local_books = self.unique.get_local_books()
+      self.remote_books = self.unique.get_remote_books()
+      
+      logging.info('%d local  AND %d remote'%(self.local_books.count(),self.remote_books.count()))
+
     else:
       self.isbn_search = False
       
@@ -85,6 +86,10 @@ class Search(object):
         if any([x.lower() in arrtitle for x in arrsearch]):
           self.text_books.append(book)       
   
+  def unique_book(self):
+    assert(self.isbn_search)
+    return self.unique
+
   def next(self):
     """
     returns the next limit (as set in the init) books
@@ -99,7 +104,7 @@ class Search(object):
     if self.isbn_search:
       return (True,
               '',
-              self.remote_books.fetch(self.limit,self.offset-self.limit)+self.local_books.fetch(self.limit,self.offset-self.limit))
+              self.remote_books.fetch(self.limit)+self.local_books.fetch(self.limit))
     else:
       return (False,
               self.search_text,
