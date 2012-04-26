@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""main.py: The main handler of all website requests.  
+            Each class handles a different URL."""
+
+__author__      = "QuickSell Group (see GitHub)"
+__copyright__   = "Copyright 2012, QuickSell"
+
 import jinja2
 import cgi
 import webapp2
@@ -22,15 +28,17 @@ import isbndb.isbndb
 from search.search import Search as mySearch
 from books.uniqueBook import UniqueBook
 
-import logging
-
-
-#template.register_template_library('common.test_filter')
-
+# this is the rendering enviornment (using Jinga2)
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
+
 class MainHandler(webapp2.RequestHandler):
+    """Handles the main website.
+
+       Args:
+           webapp2.requestHandler: the webapp request to serve.
+    """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -42,6 +50,7 @@ class MainHandler(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+#the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -52,6 +61,11 @@ class MainHandler(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class BrowseBooks(webapp2.RequestHandler):
+  """Handles the BrowseBooks page.  Very similar to the MainHandler.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -63,8 +77,10 @@ class BrowseBooks(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
 
+    #get all books from database
     books = models.UniqueBook.all().order('-lastAdded')
     
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -76,6 +92,11 @@ class BrowseBooks(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class BookInformation(webapp2.RequestHandler):
+  """The page where a specific book is clicked.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -87,10 +108,11 @@ class BookInformation(webapp2.RequestHandler):
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
       
+    # fetches the book from the DB
     book_id = cgi.escape(self.request.get('id'))
-
     book = models.Book.get(book_id)
 
+    #the values passed to html
     template_values = {
       'url_linktext': url_linktext,
       'url': url,
@@ -103,6 +125,11 @@ class BookInformation(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class EditBook(webapp2.RequestHandler):
+  """Editing a book web page.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -112,14 +139,16 @@ class EditBook(webapp2.RequestHandler):
           nickname = user.nickname()
           url = users.create_logout_url(self.request.uri)
           url_linktext = 'Logout'
-      
+    #get book from db
     book_id = cgi.escape(self.request.get('id'))
     book = models.Book.get(book_id)
     
+    #check if correct user
     if not user == book.user:
       self.redirect("/browse")
       return   
-      
+
+    #the values passed to render the html      
     template_values = {
       'url_linktext': url_linktext,
       'book': book,
@@ -136,6 +165,12 @@ class EditBook(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class EditBookForm(webapp2.RequestHandler):
+  """Handles the POST form when editing a book.  Notice the post() function is 
+     defined, not the get() function as in most handlers.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -160,24 +195,24 @@ class EditBookForm(webapp2.RequestHandler):
     
     book_id = cgi.escape(self.request.get("book_id"))
     book = models.Book.get(book_id)
-    
+
+    # if the book is valid, update it.
     if(book):
       book.price=price
       book.condition=condition
       book.title=title
-      '''book_to_update= models.Book(isbn=text_isbn, 
-                                 title=title, 
-                                 price=price,
-                                 condition=condition,
-                                 user=user,
-                                 is_local=True)'''
       book.put()
-      
       self.redirect("/user")
     else:
       self.redirect('/edit?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class RemoveBook(webapp2.RequestHandler):
+  """Handles the removal book page.  Checks to see if the user is logged in and
+     if so, removes it from the site.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -188,14 +223,16 @@ class RemoveBook(webapp2.RequestHandler):
           url = users.create_logout_url(self.request.uri)
           url_linktext = 'Logout'
     
-    
+    #get book from db
     book_id = cgi.escape(self.request.get('id'))
     book = models.Book.get(book_id)
     
+    #check correct user
     if not user == book.user:
       self.redirect("/browse")
       return   
       
+    #the values passed to render the html      
     template_values = {
       'url_linktext': url_linktext,
       'url': url,
@@ -213,6 +250,11 @@ class RemoveBook(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
 class RemoveBookForm(webapp2.RequestHandler):
+  """Handles the POST form to remove a book.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -246,6 +288,11 @@ class RemoveBookForm(webapp2.RequestHandler):
      
       
 class SellBooks(webapp2.RequestHandler):
+  """Handles the sell a book page.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if not user:
@@ -256,7 +303,7 @@ class SellBooks(webapp2.RequestHandler):
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Log Out'
     
-    
+    #the values passed to render the html   
     template_values = {
       'url' : url,
       'url_linktext' : url_linktext,
@@ -272,6 +319,11 @@ class SellBooks(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
     
 class SellBookForm(webapp2.RequestHandler):
+  """Handles the POST form to sell a book.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def post(self):
     user = users.get_current_user()
     if not user:
@@ -303,13 +355,18 @@ class SellBookForm(webapp2.RequestHandler):
                                  
       book_to_insert.put()
       
-      search = mySearch(text_isbn) # this will add the unique book if it doesn't exist
-
+      # this will add the unique book if it doesn't exist
+      search = mySearch(text_isbn)
       self.redirect("/browse")
     else:
       self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
 
 class RecentSoldBooks(webapp2.RequestHandler):
+  """Recent sold books page.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -320,10 +377,12 @@ class RecentSoldBooks(webapp2.RequestHandler):
       nickname = ""
       url = users.create_login_url(self.request.uri)
       url_linktext = "Log In"
-
+      
+      #get book from db
     books = models.Book.all().order('-sold_date')
     books
     
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -336,6 +395,11 @@ class RecentSoldBooks(webapp2.RequestHandler):
     
                
 class UserProfile(webapp2.RequestHandler):
+  """User profile page.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     user = users.get_current_user()
     if user:
@@ -346,10 +410,11 @@ class UserProfile(webapp2.RequestHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
       
-
+    #get book db
     user_email = user.email()
     user_books = models.Book.all().filter('user = ', user)
 
+    #the values passed to html
     template_values = {
       'url' : url,
       'url_linktext': url_linktext,
@@ -364,11 +429,15 @@ class UserProfile(webapp2.RequestHandler):
     
     
 class Search(webapp2.RequestHandler):
+  """Handles the search functionality.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
   def get(self):
     self.post()
 
   def post(self):
-    
     user = users.get_current_user()
 
     if user:
@@ -416,6 +485,7 @@ class Search(webapp2.RequestHandler):
       template = jinja_environment.get_template('html/browse.html')
       self.response.out.write(template.render(template_values))
 
+# this tells what urls to map to what classes.
     
 app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/browse', BrowseBooks),

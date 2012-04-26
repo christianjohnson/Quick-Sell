@@ -60,7 +60,7 @@ class Search(object):
         logging.info('found %d books on isbndb'%len(isbnbooks))
         
         if(len(isbnbooks) == 0):
-          UniqueBook(self.isbn.format(''),'Book not found on ISBNDB')
+          UniqueBook(self.isbn.format(''),'ISBN is valid, but book not found on isbndb')
         else:
           UniqueBook(self.isbn.format(''),isbnbooks[0].title)
         
