@@ -31,17 +31,17 @@ class isbndb:
     if(isbn):
       url+='&index1=isbn&value1='+isbn
       logging.debug('URL::: %s'%(url))
-      xmlResponse = urllib.urlopen(url).read()
     elif(title):
       url+='&index1=title&value1='+title
-      xmlResponse = urllib.urlopen(url).read()
     elif(combined):
       url+='&index1=combined&value1='+combined
-      xmlResponse = urllib.urlopen(url).read()
     elif(full):
       url+='&index1=full&value1='+full
-      xmlResponse = urllib.urlopen(url).read()
     else:
+      return []
+    try:
+      xmlResponse = urllib.urlopen(url).read()
+    except HTTPException:
       return []
 
     books = []
