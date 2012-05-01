@@ -197,9 +197,10 @@ class ContactSeller(webapp2.RequestHandler):
     # if the book is valid, update it.
     if(book):
       mail.send_mail(sender="RPI QuickSell <rpiquicksell@rpiquicksell.appspotmail.com>",
-                    to=book.user.email(),
-                    subject=user.nickname() + " wants to purchase " + book.unique.title,
-                    body="""
+                     to=book.user.email(),
+                     subject=user.nickname() + " wants to purchase " + book.unique.title,
+                     reply_to=user.email(),
+                     body="""
       Hello:
 
       Your book, %s, has a potential buyer.  Please email them at: %s.
@@ -207,7 +208,7 @@ class ContactSeller(webapp2.RequestHandler):
       The Quick Sell Team
       """ % (book.unique.title, user.email()))
     
-    url_to_go = "http://rpiquicksell.appspot.com/bookInformation?id=%s&e=1" % (str(book_id))
+    url_to_go = "/bookInformation?id=%s&e=1" % (book_id)
     logging.debug(str(book_id) + ", " + url_to_go)
     self.redirect(url_to_go)
 
