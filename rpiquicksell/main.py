@@ -198,7 +198,6 @@ class ContactSeller(webapp2.RequestHandler):
 
     # if the book is valid, update it.
     if(book):
-      referer = self.request.environ['HTTP_REFERER'] if 'HTTP_REFERER' in self.request.environ else  None
       mail.send_mail(sender="RPI QuickSell <rpiquicksell@rpiquicksell.appspotmail.com>",
                     to=book.user.email(),
                     subject=user.nickname() + " wants to purchase " + book.unique.title,
@@ -209,8 +208,10 @@ class ContactSeller(webapp2.RequestHandler):
 
       The Quick Sell Team
       """ % (book.unique.title, user.email()))
-      
-    self.redirect(referer + "&e=1")
+    
+    url_to_go = "http://rpiquicksell.appspot.com/bookInformation?id=%s&e=1" % (book_id)
+    
+    self.redirect(url_to_go)
 
 class EditBookForm(webapp2.RequestHandler):
   """Handles the POST form when editing a book.  Notice the post() function is 
