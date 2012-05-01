@@ -396,6 +396,7 @@ class SellBookForm(webapp2.RequestHandler):
     if(text_isbn):
       # this will add the unique book if it doesn't exist
       search = mySearch(text_isbn)
+      search.unique_book().update_date()
       
       book_to_insert = models.Book(unique=search.unique_book().book, 
                                  description=description, 
