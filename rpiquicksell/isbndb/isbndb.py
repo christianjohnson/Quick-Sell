@@ -2,6 +2,7 @@ import xml.dom.minidom
 import urllib
 import book
 import logging
+import httplib
 
 class isbndb:
   def __init__(self,isbndb_access_key='X5ANT93D'):
@@ -41,7 +42,7 @@ class isbndb:
       return []
     try:
       xmlResponse = urllib.urlopen(url).read()
-    except HTTPException:
+    except httplib.HTTPException:
       return []
 
     books = []

@@ -5,6 +5,7 @@ class UniqueBook(db.Model):
   title = db.StringProperty(required=True)
   lastAdded = db.DateTimeProperty()
   sellpage = db.StringProperty(required=True)
+  requery = db.BooleanProperty()
 
 class Book(db.Model):
   """Models an individual book."""

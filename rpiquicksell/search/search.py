@@ -51,7 +51,7 @@ class Search(object):
       self.unique = UniqueBook(self.isbn.format(''))
       remote_books = models.Book.all().filter('isbn =',self.isbn.format('')).filter('is_local =', False).filter('date >=',datetime.datetime.now()-datetime.timedelta(days=10)).order('-date').get()
       
-      if not self.unique.found:
+      if not self.unique.found or self.unique.book.requery or self.unique.book.requery==None:
       
         isbndb_query = isbndb()
         
@@ -62,9 +62,9 @@ class Search(object):
         logging.info('found %d books on isbndb'%len(isbnbooks))
         
         if(len(isbnbooks) == 0):
-          self.unique.create_book('ISBN valid, but book not found')
+          self.unique.create_book(title='ISBN valid, but book not found',requery=True)
         else:
-          self.unique.create_book(isbnbooks[0].title)
+          self.unique.create_book(title=isbnbooks[0].title,requery=False)
         
         for book in isbnbooks:
           book.add_to_database(self.unique.book)
