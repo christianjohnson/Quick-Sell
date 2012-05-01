@@ -199,6 +199,7 @@ class ContactSeller(webapp2.RequestHandler):
       mail.send_mail(sender="RPI QuickSell <rpiquicksell@rpiquicksell.appspotmail.com>",
                      to=book.user.email(),
                      subject=user.nickname() + " wants to purchase " + book.unique.title,
+                     reply_to=user.email(),
                      body="""
       Hello:
 
