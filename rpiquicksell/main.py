@@ -208,6 +208,7 @@ class ContactSeller(webapp2.RequestHandler):
       """ % (book.unique.title, user.email()))
     
     url_to_go = "http://rpiquicksell.appspot.com/bookInformation?id=%s&e=1" % (str(book_id))
+    logging.debug(str(book_id) + ", " + url_to_go)
     self.redirect(url_to_go)
 
 class EditBookForm(webapp2.RequestHandler):
