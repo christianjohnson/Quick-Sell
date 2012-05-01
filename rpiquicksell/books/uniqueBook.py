@@ -1,3 +1,4 @@
+from google.appengine.ext import db
 import models
 import datetime
 import urllib
@@ -22,12 +23,13 @@ class UniqueBook(object):
       self.requery = requery
   
   def create_book(self,title,requery):
-    if(self.found):
+    if self.found:
       self.title = title
       self.requery = requery
       self.book.title = title
       self.book.requery = requery
-      self.book.put()
+      self.book.sellpage = self.sell_page()
+      db.put(self.book)
       return
     self.title = title
     self.book = models.UniqueBook(isbn = self.isbn,
@@ -46,7 +48,7 @@ class UniqueBook(object):
     self.book.title = title
     self.title = title
     self.book.sellpage = self.sell_page()
-    self.book.put()
+    db.put(self.book)
   
   def sell_page(self):
     return '/sell?'+urllib.urlencode({'isbn':self.isbn,'title':self.title})

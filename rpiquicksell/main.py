@@ -517,7 +517,7 @@ class Search(webapp2.RequestHandler):
         'nickname' : nickname,
         'bookTitle':search.unique_book().title,
         'text_isbn':text_isbn,
-        'book_not_found':books==[]
+        'book_not_found':False
       }
 
     
