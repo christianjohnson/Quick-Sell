@@ -190,8 +190,6 @@ class ContactSeller(webapp2.RequestHandler):
       self.redirect(users.create_login_url(self.request.uri))
       return
 
-    nickname = user.nickname()
-
     #Form data
     book_id = cgi.escape(self.request.get("book_id"))
     book = models.Book.get(book_id)
@@ -209,8 +207,7 @@ class ContactSeller(webapp2.RequestHandler):
       The Quick Sell Team
       """ % (book.unique.title, user.email()))
     
-    url_to_go = "http://rpiquicksell.appspot.com/bookInformation?id=%s&e=1" % (book_id)
-    
+    url_to_go = "http://rpiquicksell.appspot.com/bookInformation?id=%s&e=1" % (str(book_id))
     self.redirect(url_to_go)
 
 class EditBookForm(webapp2.RequestHandler):
