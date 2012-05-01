@@ -187,9 +187,10 @@ class ContactSeller(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
     if not user:
-      nickname = user.nickname()
       self.redirect(users.create_login_url(self.request.uri))
       return
+
+    nickname = user.nickname()
 
     #Form data
     book_id = cgi.escape(self.request.get("book_id"))
