@@ -13,6 +13,7 @@ import urllib
 import urlparse
 
 from google.appengine.api import users
+from google.appengine.api import mail
 from google.appengine.ext.db import BadValueError
 from google.appengine.ext.webapp import template
 
@@ -111,6 +112,17 @@ class BookInformation(webapp2.RequestHandler):
     # fetches the book from the DB
     book_id = cgi.escape(self.request.get('id'))
     book = models.Book.get(book_id)
+    
+    emailed = cgi.escape(self.request.get("e"))
+    
+    try:
+      emailed = int(emailed)
+      if emailed == 1:
+        text = 1
+      else:
+        text = None
+    except:
+      text = None
 
     #the values passed to html
     template_values = {
@@ -118,7 +130,8 @@ class BookInformation(webapp2.RequestHandler):
       'url': url,
       'book': book,
       'email': book.user.email(),
-      'nickname' : nickname
+      'nickname' : nickname,
+      'text': text,
     }
 
     template = jinja_environment.get_template('html/bookinfo.html')
@@ -163,6 +176,40 @@ class EditBook(webapp2.RequestHandler):
 
     template = jinja_environment.get_template('html/edit.html')
     self.response.out.write(template.render(template_values))
+
+class ContactSeller(webapp2.RequestHandler):
+  """Contact Seller.  Notice the post() function is 
+     defined, not the get() function as in most handlers.
+
+     Args:
+         webapp2.requestHandler: the webapp request to serve.
+  """
+  def get(self):
+    user = users.get_current_user()
+    if not user:
+      nickname = user.nickname()
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    #Form data
+    book_id = cgi.escape(self.request.get("book_id"))
+    book = models.Book.get(book_id)
+
+    # if the book is valid, update it.
+    if(book):
+      referer = self.request.environ['HTTP_REFERER'] if 'HTTP_REFERER' in self.request.environ else  None
+      mail.send_mail(sender="RPI QuickSell <rpiquicksell@rpiquicksell.appspotmail.com>",
+                    to=book.user.email(),
+                    subject=user.nickname() + " wants to purchase " + book.unique.title,
+                    body="""
+      Hello:
+
+      Your book, %s, has a potential buyer.  Please email them at: %s.
+
+      The Quick Sell Team
+      """ % (book.unique.title, user.email()))
+      
+    self.redirect(referer + "&e=1")
 
 class EditBookForm(webapp2.RequestHandler):
   """Handles the POST form when editing a book.  Notice the post() function is 
@@ -499,6 +546,7 @@ app = webapp2.WSGIApplication([('/', MainHandler),
                                ('/editBook', EditBookForm),
                                ('/remove', RemoveBook),
                                ('/removeBook', RemoveBookForm),
-                               ('/recentBook', RecentSoldBooks)],
+                               ('/recentBook', RecentSoldBooks),
+                               ('/contactSeller', ContactSeller)],
                                debug=True)
 

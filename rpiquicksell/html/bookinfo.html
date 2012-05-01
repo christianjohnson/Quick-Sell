@@ -43,7 +43,7 @@
             <td>{{ book.unique.isbn }}</td>
             <td>${{ book.price }}</td>
             <td>{{ book.condition }}</td>
-            <td><a href="mailto:{{ email }}">{{email}}</a></td>
+            <td>{% if text %}Seller Contacted{% else %}<a href="/contactSeller?book_id={{ book.key() }}">Click Here to Contact Seller</a>{% endif %}</td>
           </tr>
         </tbody>
       </table>
