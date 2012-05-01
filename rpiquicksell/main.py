@@ -356,7 +356,7 @@ class SellBooks(webapp2.RequestHandler):
       'url_linktext' : url_linktext,
       'email' : user.email(),
       'badisbn' : cgi.escape(self.request.get('badisbn')),
-      'title' : cgi.escape(self.request.get('title')),
+      'description' : cgi.escape(self.request.get('description')),
       'price' : cgi.escape(self.request.get('price')),
       'isbn' : cgi.escape(self.request.get('isbn')),
       'nickname' : nickname
@@ -407,7 +407,7 @@ class SellBookForm(webapp2.RequestHandler):
       
       self.redirect("/browse")
     else:
-      self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'title':title}))
+      self.redirect('/sell?'+urllib.urlencode({'badisbn':True,'price':price,'description':description}))
 
 class RecentSoldBooks(webapp2.RequestHandler):
   """Recent sold books page.
@@ -514,7 +514,7 @@ class Search(webapp2.RequestHandler):
         'url_linktext': url_linktext,
         'books': books,
         'nickname' : nickname,
-        'bookTitle':arg1,
+        'bookTitle':search.unique_book().title,
         'text_isbn':text_isbn,
         'book_not_found':books==[]
       }
